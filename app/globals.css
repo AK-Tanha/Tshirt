@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0B2E33;
+  --color-forest: #1E5631;
+  --color-bone: #F4F1E9;
+  --color-gold: #B8912F;
+  --color-slate: #3A4A45;
+  
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+@layer base {
+  button, input, select, textarea {
+    font-family: inherit;
+    appearance: none;
+    border-radius: 0.125rem;
+  }
+}

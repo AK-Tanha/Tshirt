@@ -1,0 +1,6 @@
+{
+  "name": "Apan Apparel Storefront",
+  "description": "Mobile-first f-commerce store for premium polos and t-shirts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
