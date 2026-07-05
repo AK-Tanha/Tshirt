@@ -59,7 +59,7 @@ export default function Home() {
       <Marquee text="New Arrivals • Limited Edition • Premium Quality • Apan Apparel •" className="bg-bone" />
 
       {/* Featured Grid */}
-      <section className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-slate/10">
+      <section className="max-w-7xl mx-auto px-6 md:px-12 pt-16 border-t border-slate/10">
         <div className="flex justify-between items-end mb-10">
           <MotionSection>
             <span className="font-mono text-forest uppercase tracking-widest text-[10px] mb-2 block">Curation</span>
@@ -88,7 +88,7 @@ export default function Home() {
       {categories.map((cat) => {
         const categoryProducts = products.filter(p => p.category === cat.id).slice(0, 4);
         return (
-          <section key={cat.id} className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-slate/10">
+          <section key={cat.id} className="max-w-7xl mx-auto px-6 md:px-12 pt-16 border-t border-slate/10">
             <div className="flex justify-between items-end mb-10">
               <MotionSection>
                 <span className="font-mono text-forest uppercase tracking-widest text-[10px] mb-2 block">{cat.label}</span>

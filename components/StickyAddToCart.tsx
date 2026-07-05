@@ -2,10 +2,12 @@
 import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import { useState } from 'react';
 import { Product } from '@/lib/types';
+import { useCart } from '@/context/CartContext';
 
 export const StickyAddToCart = ({ product }: { product: Product }) => {
   const [isVisible, setIsVisible] = useState(false);
   const { scrollY } = useScroll();
+  const { dispatch } = useCart();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsVisible(latest > 400);
@@ -23,7 +25,12 @@ export const StickyAddToCart = ({ product }: { product: Product }) => {
           <span className="font-display text-lg text-navy">{product.name}</span>
           <span className="font-mono text-xs text-forest">৳{product.price}</span>
         </div>
-        <button className="bg-forest text-bone px-6 py-2 font-body uppercase text-sm tracking-[0.05em]">Add to Cart</button>
+        <button
+          onClick={() => dispatch({ type: 'ADD_ITEM', payload: { productId: product.id, quantity: 1 } })}
+          className="bg-forest text-bone px-6 py-2 font-body uppercase text-sm tracking-[0.05em]"
+        >
+          Add to Cart
+        </button>
       </div>
     </motion.div>
   );

@@ -20,7 +20,6 @@ export interface ProductVariant {
 }
 
 export interface CartItem {
-  variantId: string;
   productId: string;
   quantity: number;
 }

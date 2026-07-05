@@ -22,7 +22,7 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           <Navbar />
           {/* Facebook Pixel Placeholder */}
           <script dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }} />
-          <div className="pt-16">
+          <div className="pt-14">
             {children}
           </div>
           <Footer />

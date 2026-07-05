@@ -43,7 +43,7 @@ function ProductContent() {
 
 export default function ProductsPage() {
   return (
-    <main className="max-w-7xl mx-auto px-4 py-12 md:py-24">
+    <main className="max-w-7xl mx-auto px-4 pb-12 md:pb-24">
       <Suspense fallback={<div>Loading...</div>}>
         <ProductContent />
       </Suspense>

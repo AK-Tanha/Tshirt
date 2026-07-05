@@ -2,6 +2,7 @@
 import { useCart } from '@/context/CartContext';
 import { products } from '@/lib/data';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MotionSection } from '@/components/MotionSection';
 
 export default function CartPage() {
@@ -15,7 +16,7 @@ export default function CartPage() {
   const subtotal = cartProducts.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   return (
-    <main className="max-w-4xl mx-auto px-6 py-16 md:py-24">
+    <main className="max-w-4xl mx-auto px-6 pb-16 md:pb-24">
       <MotionSection>
         <div className="flex justify-between items-end mb-10 border-b border-slate/10 pb-8">
           <div>
@@ -36,9 +37,9 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-12 gap-12">
             <div className="lg:col-span-8">
               {cartProducts.map(item => (
-                <div key={item.variantId} className="group border-b border-slate/10 py-8 flex gap-8 items-start">
-                  <div className="relative w-28 aspect-[4/5] bg-slate/5 overflow-hidden">
-                    <img src={item.product.images[0]} alt={item.product.name} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" />
+                <div key={item.productId} className="group border-b border-slate/10 py-8 flex gap-8 items-start">
+                   <div className="relative w-28 aspect-[4/5] bg-slate/5 overflow-hidden">
+                     <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start">
@@ -51,7 +52,7 @@ export default function CartPage() {
                     <div className="flex justify-between items-end mt-2">
                        <span className="font-mono text-[10px] text-slate/40 uppercase tracking-widest">Qty: {item.quantity}</span>
                        <button 
-                        onClick={() => dispatch({ type: 'REMOVE_ITEM', payload: item.variantId })} 
+                         onClick={() => dispatch({ type: 'REMOVE_ITEM', payload: item.productId })} 
                         className="font-mono text-[10px] text-red-800 uppercase tracking-widest border-b border-transparent hover:border-red-800 pb-0.5 transition-all"
                        >
                         Remove
