@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import { Inter, Bebas_Neue, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css'; 
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
@@ -21,9 +22,10 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           <Navbar />
           {/* Facebook Pixel Placeholder */}
           <script dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }} />
-          <div className="pt-24">
+          <div className="pt-16">
             {children}
           </div>
+          <Footer />
         </CartProvider>
       </body>
     </html>
