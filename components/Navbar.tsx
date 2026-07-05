@@ -28,7 +28,7 @@ export const Navbar = () => {
       <nav className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
         <Link href="/" className="group flex flex-col">
           <span className="font-display text-3xl tracking-tighter text-navy leading-none">APAN</span>
-          <span className="font-mono text-[8px] tracking-[0.3em] text-forest opacity-0 group-hover:opacity-100 transition-opacity">APPAREL</span>
+          <span className="font-mono text-[8px] tracking-[0.3em] text-forest">Traders</span>
         </Link>
         <div className="flex gap-8 items-center">
           <Link href="/products" className="font-body text-xs uppercase tracking-widest text-navy hover:text-forest transition-colors">Archive</Link>
