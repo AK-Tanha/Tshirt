@@ -2,7 +2,6 @@
 import { Product } from '@/lib/types';
 import Link from 'next/link';
 import Image from 'next/image';
-import { GarmentTag } from './GarmentTag';
 import { motion } from 'motion/react';
 
 interface ProductCardProps {
@@ -12,11 +11,11 @@ interface ProductCardProps {
 export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <motion.div
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -6 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Link href={`/products/${product.slug}`} className="group block border border-slate/10 p-2 bg-bone hover:border-forest transition-colors duration-500">
-        <div className="relative aspect-[4/5] mb-6 overflow-hidden">
+      <Link href={`/products/${product.slug}`} className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-500">
+        <div className="relative aspect-[4/5] overflow-hidden bg-stone">
           <Image 
             src={product.images[0]} 
             alt={product.name} 
@@ -24,21 +23,16 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
             referrerPolicy="no-referrer" 
           />
-          <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/5 transition-colors duration-500" />
-          <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-            <button className="w-full bg-bone text-navy font-body text-[10px] uppercase tracking-widest py-3 hover:bg-forest hover:text-bone transition-colors">
-              Quick View
-            </button>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        </div>
+        <div className="p-3 md:p-4">
+          <h3 className="font-display text-sm md:text-lg text-black leading-tight tracking-tight font-bold">{product.name}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="font-body text-[11px] md:text-xs text-muted">{product.category}</p>
+            <span className="text-muted/30">·</span>
+            <p className="font-body text-sm md:text-base text-black font-semibold">৳{product.price}</p>
           </div>
         </div>
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h3 className="font-display text-lg text-navy mb-1 uppercase tracking-tight group-hover:text-forest transition-colors">{product.name}</h3>
-            <p className="font-mono text-[10px] text-slate/60 uppercase tracking-widest">{product.category}</p>
-          </div>
-          <p className="font-mono text-sm text-forest font-bold">৳{product.price}</p>
-        </div>
-        <GarmentTag size="S-XXL" color="NVY" sku={product.id.toUpperCase()} className="opacity-60 group-hover:opacity-100 transition-opacity" />
       </Link>
     </motion.div>
   );

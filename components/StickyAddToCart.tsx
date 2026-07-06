@@ -3,6 +3,7 @@ import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import { useState } from 'react';
 import { Product } from '@/lib/types';
 import { useCart } from '@/context/CartContext';
+import { ShoppingBag } from 'lucide-react';
 
 export const StickyAddToCart = ({ product }: { product: Product }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -15,21 +16,22 @@ export const StickyAddToCart = ({ product }: { product: Product }) => {
 
   return (
     <motion.div
-      className="fixed bottom-0 left-0 w-full bg-bone border-t border-slate p-4 z-40 md:hidden"
+      className="fixed bottom-0 left-0 w-full bg-white border-t border-slate/10 px-4 py-3 z-40 md:hidden shadow-lg"
       initial={{ y: 100 }}
       animate={{ y: isVisible ? 0 : 100 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex justify-between items-center">
-        <div className="flex flex-col">
-          <span className="font-display text-lg text-navy">{product.name}</span>
-          <span className="font-mono text-xs text-forest">৳{product.price}</span>
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex flex-col min-w-0">
+          <span className="font-display text-base text-black truncate font-bold">{product.name}</span>
+          <span className="font-body text-sm text-black/60">৳{product.price}</span>
         </div>
         <button
           onClick={() => dispatch({ type: 'ADD_ITEM', payload: { productId: product.id, quantity: 1 } })}
-          className="bg-forest text-bone px-6 py-2 font-body uppercase text-sm tracking-[0.05em]"
+          className="bg-black text-white px-6 py-3 rounded-xl font-body text-sm font-medium hover:bg-black/90 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-black/10"
         >
-          Add to Cart
+          <ShoppingBag className="w-3.5 h-3.5" />
+          Add to Bag
         </button>
       </div>
     </motion.div>

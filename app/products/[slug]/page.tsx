@@ -26,12 +26,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ slug
   if (!product) notFound();
 
   return (
-    <main className="max-w-7xl mx-auto px-6 md:px-12 pb-16 md:pb-24">
-      <div className="mb-8">
-        <Link href="/products" className="font-mono text-[10px] text-slate/60 uppercase tracking-widest hover:text-forest transition-colors flex items-center gap-2">
-          ← Archive / <span className="text-navy">{product.category}</span>
-        </Link>
-      </div>
+    <main className="max-w-7xl mx-auto px-4 md:px-12 pb-24 md:pb-32">
       <ProductDetailClient product={product} />
       <StickyAddToCart product={product} />
     </main>
