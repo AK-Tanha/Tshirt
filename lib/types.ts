@@ -7,7 +7,21 @@ export interface Product {
   description: string;
   category: Category;
   price: number;
-  images: string[];
+  heroImage: string;
+  extraImages: string[];
+  vendorId?: string;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  address: string;
+  status: 'active' | 'inactive';
+  supplyCategories: string[];
+  createdAt: string;
 }
 
 export interface ProductVariant {
@@ -34,4 +48,26 @@ export interface Order {
   paymentMethod: 'cod';
   status: 'pending_confirmation' | 'confirmed' | 'shipped' | 'delivered' | 'returned';
   createdAt: string;
+}
+
+export interface InvoiceItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface Invoice {
+  invoiceNo: string;
+  orderId: string;
+  customerName: string;
+  phone: string;
+  address: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  tax: number;
+  grandTotal: number;
+  status: 'paid' | 'unpaid';
+  issuedAt: string;
 }

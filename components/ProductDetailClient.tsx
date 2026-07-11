@@ -21,7 +21,7 @@ export const ProductDetailClient = ({ product }: { product: Product }) => {
       <MotionSection className="lg:col-span-7">
         <div className="relative aspect-[4/5] bg-stone rounded-2xl overflow-hidden group">
           <Image
-            src={product.images[0]}
+            src={product.heroImage}
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -32,14 +32,15 @@ export const ProductDetailClient = ({ product }: { product: Product }) => {
             <span className="bg-white/90 backdrop-blur-sm text-black font-mono text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-full">Limited</span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-4">
-          <div className="relative aspect-square bg-stone rounded-xl overflow-hidden">
-            <Image src={product.images[0]} alt={product.name} fill className="object-cover hover:scale-105 transition-transform duration-700 ease-out" />
+        {product.extraImages.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-4">
+            {product.extraImages.map((img, i) => (
+              <div key={i} className="relative aspect-square bg-stone rounded-xl overflow-hidden">
+                <Image src={img} alt={`${product.name} ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-700 ease-out" />
+              </div>
+            ))}
           </div>
-          <div className="relative aspect-square bg-stone rounded-xl overflow-hidden">
-            <Image src={product.images[0]} alt={product.name} fill className="object-cover hover:scale-105 transition-transform duration-700 ease-out" />
-          </div>
-        </div>
+        )}
       </MotionSection>
 
       <MotionSection className="lg:col-span-5">

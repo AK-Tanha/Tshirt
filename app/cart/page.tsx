@@ -39,7 +39,7 @@ export default function CartPage() {
               {cartProducts.map(item => (
                 <div key={item.productId} className="group border-b border-border py-8 flex gap-6 items-start">
                    <div className="relative w-24 md:w-28 aspect-[4/5] bg-stone rounded-lg overflow-hidden">
-                     <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                      <Image src={item.product.heroImage} alt={item.product.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-start gap-4">

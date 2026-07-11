@@ -17,7 +17,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <Link href={`/products/${product.slug}`} className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-500">
         <div className="relative aspect-[4/5] overflow-hidden bg-stone">
           <Image 
-            src={product.images[0]} 
+            src={product.heroImage} 
             alt={product.name} 
             fill 
             className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 

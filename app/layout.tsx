@@ -1,9 +1,8 @@
 import type {Metadata} from 'next';
 import { Inter, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css'; 
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
+import { AppShell } from '@/components/AppShell';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
 const plex = IBM_Plex_Mono({ subsets: ['latin'], weight: '400', variable: '--font-mono' });
@@ -18,13 +17,10 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
     <html lang="en" className={`${inter.variable} ${plex.variable}`}>
       <body className="bg-white text-black font-body antialiased" suppressHydrationWarning>
         <CartProvider>
-          <Navbar />
-          {/* Facebook Pixel Placeholder */}
-          <script dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }} />
-          <div className="pt-14">
+          <AppShell>
             {children}
-          </div>
-          <Footer />
+          </AppShell>
+          <script dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }} />
         </CartProvider>
       </body>
     </html>

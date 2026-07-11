@@ -74,7 +74,7 @@ export const Navbar = () => {
                             className="group flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-stone transition-colors"
                           >
                             <div className="relative w-10 h-12 rounded-md overflow-hidden bg-stone shrink-0">
-                              <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
+                              <Image src={item.heroImage} alt={item.name} fill className="object-cover" />
                             </div>
                             <div className="min-w-0">
                               <span className="font-body text-xs text-black group-hover:text-muted transition-colors block truncate">{item.name}</span>
