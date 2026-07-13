@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { vendors } from '@/lib/data';
+import { suppliers } from '@/lib/data';
 import { ImageDropzone, type ImageFile } from '@/components/ImageDropzone';
 import { Field, getInputClass } from '@/components/ui/Field';
 import { Loader2, ArrowLeft } from 'lucide-react';
@@ -14,7 +14,7 @@ export default function CreateProductPage() {
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<'tshirt' | 'polo'>('tshirt');
-  const [vendorId, setVendorId] = useState('');
+  const [supplierId, setSupplierId] = useState('');
   const [heroImages, setHeroImages] = useState<ImageFile[]>([]);
   const [extraImages, setExtraImages] = useState<ImageFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -38,7 +38,7 @@ export default function CreateProductPage() {
         price: Number(price),
         description,
         category,
-        vendorId,
+        supplierId,
         heroImage: heroImages[0]?.dataUrl || 'https://picsum.photos/seed/placeholder/800/800',
         extraImages: extraImages.map((i) => i.dataUrl),
       });
@@ -95,10 +95,10 @@ export default function CreateProductPage() {
           </div>
 
           <Field label="Supplier">
-            <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none transition-all duration-200 focus:border-black focus:ring-1 focus:ring-black/10 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a3a3a3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_12px_center] bg-no-repeat pr-10">
-              <option value="">Select a vendor...</option>
-              {vendors.filter((v) => v.status === 'active').map((v) => (
-                <option key={v.id} value={v.id}>{v.name}</option>
+            <select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none transition-all duration-200 focus:border-black focus:ring-1 focus:ring-black/10 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a3a3a3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_12px_center] bg-no-repeat pr-10">
+              <option value="">Select a supplier...</option>
+              {suppliers.filter((s) => s.status === 'active').map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
           </Field>

@@ -9,10 +9,10 @@ export interface Product {
   price: number;
   heroImage: string;
   extraImages: string[];
-  vendorId?: string;
+  supplierId?: string;
 }
 
-export interface Vendor {
+export interface Supplier {
   id: string;
   name: string;
   contactPerson: string;

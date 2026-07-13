@@ -4,10 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Field, getInputClass } from '@/components/ui/Field';
+import { useToast } from '@/components/ui/Toast';
 import { Save, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 
-export default function CreateVendorPage() {
+export default function CreateSupplierPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [form, setForm] = useState({ name: '', contact: '', email: '', phone: '', address: '' });
   const [categories, setCategories] = useState<string[]>([]);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -16,7 +18,7 @@ export default function CreateVendorPage() {
   const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
 
   const errors: Record<string, string> = {};
-  if (!form.name.trim() && touched.name) errors.name = 'Vendor name is required';
+  if (!form.name.trim() && touched.name) errors.name = 'Supplier name is required';
   if (!form.contact.trim() && touched.contact) errors.contact = 'Contact person is required';
   if (!form.phone.trim() && touched.phone) errors.phone = 'Phone number is required';
   if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) && touched.email) errors.email = 'Invalid email format';
@@ -35,8 +37,8 @@ export default function CreateVendorPage() {
     if (!valid) return;
     setSubmitting(true);
 
-    const vendor = {
-      id: `ven_${Date.now().toString(36)}`,
+    const supplier = {
+      id: `sup_${Date.now().toString(36)}`,
       name: form.name.trim(),
       contactPerson: form.contact.trim(),
       email: form.email.trim(),
@@ -47,11 +49,14 @@ export default function CreateVendorPage() {
       createdAt: new Date().toISOString(),
     };
 
-    const existing = JSON.parse(sessionStorage.getItem('new_vendors') || '[]');
-    existing.unshift(vendor);
-    sessionStorage.setItem('new_vendors', JSON.stringify(existing));
+    const existing = JSON.parse(sessionStorage.getItem('new_suppliers') || '[]');
+    existing.unshift(supplier);
+    sessionStorage.setItem('new_suppliers', JSON.stringify(existing));
 
-    setTimeout(() => { router.push('/admin/vendors'); }, 600);
+    setTimeout(() => {
+      toast(`Supplier "${supplier.name}" created successfully`);
+      router.push('/admin/suppliers');
+    }, 400);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -64,14 +69,14 @@ export default function CreateVendorPage() {
         <button onClick={() => router.back()} className="p-2 hover:bg-stone rounded-lg transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Add Vendor</h1>
+        <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Add Supplier</h1>
       </div>
 
       <div className="bg-white rounded-xl border border-border p-6" onKeyDown={handleKeyDown}>
         <div className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <Field label="Vendor Name" required error={errors.name}>
+              <Field label="Supplier Name" required error={errors.name}>
                 <input
                   type="text"
                   value={form.name}
@@ -99,7 +104,7 @@ export default function CreateVendorPage() {
                 value={form.email}
                 onChange={(e) => set('email', e.target.value)}
                 onBlur={() => setTouched((p) => ({ ...p, email: true }))}
-                placeholder="email@vendor.com"
+                placeholder="email@supplier.com"
                 className={getInputClass(errors.email)}
               />
             </Field>
@@ -163,7 +168,7 @@ export default function CreateVendorPage() {
             >
               {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
               <Save className="w-4 h-4" />
-              Add Vendor
+              Add Supplier
             </button>
           </div>
         </div>

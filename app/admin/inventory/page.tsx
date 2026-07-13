@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { products, variants, vendors } from '@/lib/data';
+import { products, variants, suppliers } from '@/lib/data';
 import type { ProductVariant } from '@/lib/types';
+import { useToast } from '@/components/ui/Toast';
 import {
   Search, Package, AlertTriangle, X, Plus, Minus, Save,
 } from 'lucide-react';
 
 const productMap = Object.fromEntries(products.map((p) => [p.id, p]));
-const vendorMap = Object.fromEntries(vendors.map((v) => [v.id, v]));
+const supplierMap = Object.fromEntries(suppliers.map((s) => [s.id, s]));
 
 export default function AdminInventory() {
   const [search, setSearch] = useState('');
@@ -19,6 +20,7 @@ export default function AdminInventory() {
   const [stock, setStock] = useState<Record<string, number>>(
     Object.fromEntries(variants.map((v) => [v.id, v.stockQuantity])),
   );
+  const { toast } = useToast();
 
   const totalStock = Object.values(stock).reduce((a, b) => a + b, 0);
   const lowStockItems = variants.filter((v) => stock[v.id] > 0 && stock[v.id] <= 5).length;
@@ -28,13 +30,13 @@ export default function AdminInventory() {
     const product = productMap[v.productId];
     if (!product) return false;
     const q = search.toLowerCase();
-    const vendor = vendorMap[product.vendorId ?? ''];
+    const supplier = supplierMap[product.supplierId ?? ''];
     return (
       product.name.toLowerCase().includes(q) ||
       v.sku.toLowerCase().includes(q) ||
       v.color.toLowerCase().includes(q) ||
       v.size.toLowerCase().includes(q) ||
-      (vendor?.name.toLowerCase().includes(q) ?? false)
+      (supplier?.name.toLowerCase().includes(q) ?? false)
     );
   });
 
@@ -46,6 +48,8 @@ export default function AdminInventory() {
   const saveStock = () => {
     if (!editingVariant) return;
     setStock((prev) => ({ ...prev, [editingVariant.id]: Math.max(0, editQty) }));
+    const product = productMap[editingVariant.productId];
+    toast(`Stock updated for ${product?.name ?? editingVariant.sku} — ${editQty} units`, 'success');
     setEditingVariant(null);
   };
 
@@ -109,14 +113,14 @@ export default function AdminInventory() {
                 <th className="p-4 font-medium">Color</th>
                 <th className="p-4 font-medium">Stock</th>
                 <th className="p-4 font-medium">Status</th>
-                <th className="p-4 font-medium">Vendor</th>
+                <th className="p-4 font-medium">Supplier</th>
                 <th className="p-4 font-medium w-10"></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((v) => {
                 const product = productMap[v.productId];
-                const vendor = product ? vendorMap[product.vendorId ?? ''] : undefined;
+                const supplier = product ? supplierMap[product.supplierId ?? ''] : undefined;
                 const qty = stock[v.id];
                 return (
                   <tr key={v.id} className="border-t border-border text-sm hover:bg-stone/30 transition-colors">
@@ -137,11 +141,11 @@ export default function AdminInventory() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted">{vendor?.name ?? '—'}</span>
-                        {vendor && (
+                        <span className="text-xs text-muted">{supplier?.name ?? '—'}</span>
+                        {supplier && (
                           <span className={cn(
                             "w-1.5 h-1.5 rounded-full shrink-0",
-                            vendor.status === 'active' ? "bg-emerald-500" : "bg-red-400",
+                            supplier.status === 'active' ? "bg-emerald-500" : "bg-red-400",
                           )} />
                         )}
                       </div>
@@ -170,7 +174,7 @@ export default function AdminInventory() {
       <div className="lg:hidden space-y-3">
         {filtered.map((v) => {
           const product = productMap[v.productId];
-          const vendor = product ? vendorMap[product.vendorId ?? ''] : undefined;
+          const supplier = product ? supplierMap[product.supplierId ?? ''] : undefined;
           const qty = stock[v.id];
           return (
             <div key={v.id} className="bg-white rounded-xl border border-border p-4 space-y-3">
@@ -185,12 +189,12 @@ export default function AdminInventory() {
                 <span className="text-muted">Size: <span className="text-black font-medium">{v.size}</span></span>
                 <span className="text-muted">Color: <span className="text-black font-medium">{v.color}</span></span>
               </div>
-              {vendor && (
+              {supplier && (
                 <div className="text-xs text-muted flex items-center gap-1.5">
-                  Vendor: <span className="text-black font-medium">{vendor.name}</span>
+                  Supplier: <span className="text-black font-medium">{supplier.name}</span>
                   <span className={cn(
                     "w-1.5 h-1.5 rounded-full",
-                    vendor.status === 'active' ? "bg-emerald-500" : "bg-red-400",
+                    supplier.status === 'active' ? "bg-emerald-500" : "bg-red-400",
                   )} />
                 </div>
               )}

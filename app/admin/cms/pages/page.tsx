@@ -1,0 +1,1 @@
+'use client'; import { PagePlaceholder } from '@/components/ui/PagePlaceholder'; export default function Page() { return <PagePlaceholder title="Pages" description="Manage static pages" />; }

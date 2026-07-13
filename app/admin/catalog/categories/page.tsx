@@ -1,0 +1,1 @@
+'use client'; import { PagePlaceholder } from '@/components/ui/PagePlaceholder'; export default function Page() { return <PagePlaceholder title="Categories" description="Manage your product categories" />; }
