@@ -28,16 +28,24 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
  collapsed ? 'w-16' : 'w-64',
  )}
  >
- <div className={cn('flex items-center h-16 px-4 border-b border-border', collapsed && 'justify-center')}>
- <Link href="/admin" className="flex items-center gap-2.5 min-w-0">
- <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
- <Store className="w-4 h-4 text-white " />
- </div>
- {!collapsed && (
- <span className="font-display text-base font-bold tracking-tight truncate">APAN</span>
- )}
- </Link>
- </div>
+  <div className={cn('flex items-center h-16 px-4 border-b border-border', collapsed && 'justify-center')}>
+  <Link href="/admin" className={cn('flex items-center gap-2.5 min-w-0', collapsed && 'hidden')}>
+  <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
+  <Store className="w-4 h-4 text-white " />
+  </div>
+  <span className="font-display text-base font-bold tracking-tight truncate">APAN</span>
+  </Link>
+  <button
+  onClick={onToggle}
+  className={cn(
+  'p-2 rounded-lg text-neutral-500 hover:bg-neutral-100 transition-colors',
+  collapsed ? 'mx-auto' : 'ml-auto',
+  )}
+  title={collapsed ? 'Expand' : 'Collapse'}
+  >
+  {collapsed ? <PanelLeft className="w-4.5 h-4.5" /> : <PanelLeftClose className="w-4.5 h-4.5" />}
+  </button>
+  </div>
 
  <nav className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-0.5">
  {navItems.map((item) => {
@@ -135,19 +143,8 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
  })}
  </nav>
 
- <div className="p-2 border-t border-border">
- <button
- onClick={onToggle}
- className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-100 transition-colors"
- >
- {collapsed ? <PanelLeft className="w-4.5 h-4.5 mx-auto" /> : (
- <>
- <PanelLeftClose className="w-4.5 h-4.5 shrink-0" />
- <span>Collapse</span>
- </>
- )}
- </button>
- <Link
+  <div className="p-2 border-t border-border">
+  <Link
  href="/"
  className={cn(
  'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-100 transition-colors',
