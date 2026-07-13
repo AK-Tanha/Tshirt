@@ -1,1 +1,10 @@
-'use client'; import { PagePlaceholder } from '@/components/ui/PagePlaceholder'; export default function Page() { return <PagePlaceholder title="Users" description="Manage admin users, roles, and permissions" />; }
+"use client";
+import { PagePlaceholder } from "@/components/ui/PagePlaceholder";
+export default function Page() {
+  return (
+    <PagePlaceholder
+      title="Users"
+      description="Manage admin users, roles, and permissions"
+    />
+  );
+}

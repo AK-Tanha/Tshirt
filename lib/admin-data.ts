@@ -54,4 +54,31 @@ export const orders: Order[] = [
  { id: 'ord_012', customerName: 'Tahmina Akhter', phone: '01777777777', address: '112 Shyamoli, Dhaka', items: [{ productId: 't3', quantity: 3 }], totalAmount: 1800, paymentMethod: 'cod', status: 'pending_confirmation', createdAt: '2026-07-04T10:05:00Z' },
 ];
 
+export interface Customer {
+ id: string;
+ name: string;
+ email: string;
+ phone: string;
+ totalOrders: number;
+ totalSpent: number;
+ lastOrderDate: string;
+ status: 'active' | 'inactive';
+ joinDate: string;
+}
+
+export const customers: Customer[] = [
+ { id: 'cst_001', name: 'Rafiq Hasan', email: 'rafiq.hasan@gmail.com', phone: '01712345678', totalOrders: 3, totalSpent: 4250, lastOrderDate: '2026-07-10T10:30:00Z', status: 'active', joinDate: '2025-11-15T08:00:00Z' },
+ { id: 'cst_002', name: 'Farhana Sultana', email: 'farhana.sultana@yahoo.com', phone: '01798765432', totalOrders: 5, totalSpent: 8700, lastOrderDate: '2026-07-08T14:15:00Z', status: 'active', joinDate: '2025-09-22T10:00:00Z' },
+ { id: 'cst_003', name: 'Shahidul Islam', email: 'shahidul.islam@outlook.com', phone: '01655555555', totalOrders: 2, totalSpent: 5400, lastOrderDate: '2026-07-01T09:45:00Z', status: 'active', joinDate: '2026-01-10T12:00:00Z' },
+ { id: 'cst_004', name: 'Nusrat Jahan', email: 'nusrat.jahan@gmail.com', phone: '01988888888', totalOrders: 4, totalSpent: 7600, lastOrderDate: '2026-07-02T11:20:00Z', status: 'active', joinDate: '2025-08-05T09:00:00Z' },
+ { id: 'cst_005', name: 'Tanvir Ahmed', email: 'tanvir.ahmed@gmail.com', phone: '01577777777', totalOrders: 6, totalSpent: 12200, lastOrderDate: '2026-07-12T16:00:00Z', status: 'active', joinDate: '2025-06-18T07:00:00Z' },
+ { id: 'cst_006', name: 'Ayesha Khatun', email: 'ayesha.khatun@yahoo.com', phone: '01866666666', totalOrders: 1, totalSpent: 2200, lastOrderDate: '2026-06-29T08:30:00Z', status: 'active', joinDate: '2026-03-20T11:00:00Z' },
+ { id: 'cst_007', name: 'Kamal Hossain', email: 'kamal.hossain@gmail.com', phone: '01744444444', totalOrders: 3, totalSpent: 5100, lastOrderDate: '2026-07-03T13:10:00Z', status: 'active', joinDate: '2025-12-01T14:00:00Z' },
+ { id: 'cst_008', name: 'Rima Begum', email: 'rima.begum@outlook.com', phone: '01933333333', totalOrders: 2, totalSpent: 3800, lastOrderDate: '2026-07-01T15:45:00Z', status: 'active', joinDate: '2026-02-14T10:00:00Z' },
+ { id: 'cst_009', name: 'Jahidul Islam', email: 'jahidul.islam@gmail.com', phone: '01622222222', totalOrders: 1, totalSpent: 650, lastOrderDate: '2026-06-27T12:00:00Z', status: 'inactive', joinDate: '2026-04-05T09:00:00Z' },
+ { id: 'cst_010', name: 'Marzia Rahman', email: 'marzia.rahman@yahoo.com', phone: '01511111111', totalOrders: 2, totalSpent: 3900, lastOrderDate: '2026-06-22T09:20:00Z', status: 'inactive', joinDate: '2025-10-30T08:00:00Z' },
+ { id: 'cst_011', name: 'Sabbir Ahmed', email: 'sabbir.ahmed@gmail.com', phone: '01899999999', totalOrders: 4, totalSpent: 6800, lastOrderDate: '2026-07-02T17:30:00Z', status: 'active', joinDate: '2025-07-12T11:00:00Z' },
+ { id: 'cst_012', name: 'Tahmina Akhter', email: 'tahmina.akhter@gmail.com', phone: '01777777777', totalOrders: 3, totalSpent: 4500, lastOrderDate: '2026-07-04T10:05:00Z', status: 'active', joinDate: '2026-01-25T15:00:00Z' },
+];
+
 export const recentOrders = orders;

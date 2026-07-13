@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo, useRef, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { products, variants } from '@/lib/data';
@@ -450,10 +450,11 @@ function FooterActions({ isSubmitting, isValid }: { isSubmitting: boolean; isVal
  );
 }
 
-export default function CreateOrderPage() {
- const router = useRouter();
- const [customerName, setCustomerName] = useState('');
- const [phone, setPhone] = useState('');
+function CreateOrderForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [customerName, setCustomerName] = useState(searchParams.get('name') || '');
+  const [phone, setPhone] = useState(searchParams.get('phone') || '');
  const [address, setAddress] = useState('');
  const [notes, setNotes] = useState('');
  const [deliveryDate, setDeliveryDate] = useState('');
@@ -613,7 +614,15 @@ export default function CreateOrderPage() {
  </div>
  </div>
  </div>
- </form>
- </div>
- );
+  </form>
+  </div>
+  );
+}
+
+export default function CreateOrderPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateOrderForm />
+    </Suspense>
+  );
 }
