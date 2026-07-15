@@ -3,6 +3,8 @@ import { Inter, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css'; 
 import { CartProvider } from '@/context/CartContext';
 import { AppShell } from '@/components/AppShell';
+import { QueryProvider } from '@/context/QueryProvider';
+
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
 const plex = IBM_Plex_Mono({ subsets: ['latin'], weight: '400', variable: '--font-mono' });
@@ -16,12 +18,14 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
  return (
  <html lang="en" className={`${inter.variable} ${plex.variable}`}>
  <body className="bg-white text-black font-body antialiased" suppressHydrationWarning>
+ <QueryProvider>
  <CartProvider>
  <AppShell>
  {children}
  </AppShell>
  <script dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }} />
  </CartProvider>
+ </QueryProvider>
  </body>
  </html>
  );

@@ -1,15 +1,56 @@
-export type Category = 'polo' | 'tshirt';
+//export type Category = 'polo' | 'tshirt';
+
+export interface ProductVariant {
+  id: string;
+  size: string;
+  color: string;
+  stock: number;
+  price: string | null; // Prisma Decimal serializes as string over JSON
+}
+
+export interface ProductImage {
+  id: string;
+  url: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 export interface Product {
- id: string;
- slug: string;
- name: string;
- description: string;
- category: Category;
- price: number;
- heroImage: string;
- extraImages: string[];
- supplierId?: string;
+  id: string;
+  name: string;
+  description: string | null;
+  basePrice: string;
+  lotNumber: string | null;
+  isActive: boolean;
+  createdAt: string;
+  category: Category;
+  images: ProductImage[];
+  variants: ProductVariant[];
+}
+
+export interface PaginatedProducts {
+  data: Product[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface ProductQueryParams {
+  search?: string;
+  categoryId?: string;
+  size?: string;
+  color?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface Supplier {
@@ -27,7 +68,7 @@ export interface Supplier {
 export interface ProductVariant {
  id: string;
  productId: string;
- size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
+ //size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
  color: string;
  sku: string;
  stockQuantity: number;
