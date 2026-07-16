@@ -1,19 +1,27 @@
 "use client";
-import { products } from "@/lib/data";
+import { useProducts } from "@/hooks/use-products";
+import { useCategories } from "@/hooks/use-categories";
 import { ProductCard } from "@/components/ProductCard";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { MotionSection } from "@/components/MotionSection";
-
 import Link from "next/link";
 
 function ProductContent() {
   const searchParams = useSearchParams();
-  const category = searchParams.get("category");
+  const categorySlug = searchParams.get("category");
 
-  const filteredProducts = category
-    ? products.filter((p) => p.category === category)
-    : products;
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+
+  // resolve slug -> id, since the backend filters by categoryId
+  const activeCategory = categories?.find((c) => c.slug === categorySlug);
+
+  const { data: products, isLoading: productsLoading } = useProducts({
+    categoryId: activeCategory?.id,
+    limit: 50,
+  });
+
+  if (categoriesLoading || productsLoading) return <div>Loading...</div>;
 
   return (
     <div className="flex flex-col gap-12">
@@ -23,36 +31,34 @@ function ProductContent() {
             Collection 2026
           </span>
           <h1 className="font-display text-5xl md:text-7xl text-black tracking-tight leading-none font-bold">
-            {category ? category : "Products"}
+            {activeCategory ? activeCategory.name : "Products"}
           </h1>
         </div>
+
         <div className="flex gap-6 font-body text-sm text-muted">
           <Link
             href="/products"
-            className={`${!category ? "text-black font-medium" : "hover:text-black"} transition-colors`}
+            className={`${!categorySlug ? "text-black font-medium" : "hover:text-black"} transition-colors`}
           >
             All
           </Link>
-          <Link
-            href="/products?category=polo"
-            className={`${category === "polo" ? "text-black font-medium" : "hover:text-black"} transition-colors`}
-          >
-            Polos
-          </Link>
-          <Link
-            href="/products?category=tshirt"
-            className={`${category === "tshirt" ? "text-black font-medium" : "hover:text-black"} transition-colors`}
-          >
-            Tees
-          </Link>
+          {categories?.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/products?category=${cat.slug}`}
+              className={`${categorySlug === cat.slug ? "text-black font-medium" : "hover:text-black"} transition-colors`}
+            >
+              {cat.name}
+            </Link>
+          ))}
           <span className="ml-2 text-muted/40">
-            {filteredProducts.length} items
+            {products?.data.length ?? 0} items
           </span>
         </div>
       </MotionSection>
 
       <MotionSection className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
-        {filteredProducts.map((product, idx) => (
+        {products?.data.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </MotionSection>

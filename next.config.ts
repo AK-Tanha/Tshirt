@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**', // This allows any path under the hostname
       },
+      {
+        protocol: 'https',
+        hostname: 'img.drz.lazcdn.com',
+        port: '',
+        pathname: '/**', // This allows any path under the hostname
+      },
     ],
   },
   output: 'standalone',

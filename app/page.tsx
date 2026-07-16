@@ -5,16 +5,14 @@ import Link from "next/link";
 import { MotionSection } from "@/components/MotionSection";
 import { Marquee } from "@/components/Marquee";
 import { motion } from "motion/react";
+import { useCategories } from "../hooks/use-categories";
 
 export default function Home() {
   const { data, isLoading, error } = useProducts({ page: 1, limit: 20 });
   const products = data?.data ?? [];
+  const { data: categories } = useCategories();
 
   const featured = products.slice(0, 4);
-  const categories = [
-    { id: "polo", name: "Polos", label: "Classic Staples" },
-    { id: "tshirt", name: "Tees", label: "Essential Basics" },
-  ];
 
   if (isLoading)
     return (
@@ -111,7 +109,7 @@ export default function Home() {
       </section>
 
       {/* Dynamic Category Sections */}
-      {categories.map((cat) => {
+      {categories?.map((cat) => {
         const categoryProducts = products
           .filter((p) => p.category.id === cat.id)
           .slice(0, 4);
@@ -123,14 +121,14 @@ export default function Home() {
             <div className="flex justify-between items-end mb-12">
               <MotionSection>
                 <span className="font-mono text-muted uppercase tracking-widest text-[10px] mb-2 block">
-                  {cat.label}
+                  {cat.name}
                 </span>
                 <h2 className="font-display text-4xl md:text-6xl text-black tracking-tight font-bold">
                   {cat.name}
                 </h2>
               </MotionSection>
               <Link
-                href={`/products?category=${cat.id}`}
+                href={`/products?category=${cat.slug}`}
                 className="font-body text-sm text-muted hover:text-black transition-colors"
               >
                 See all →
