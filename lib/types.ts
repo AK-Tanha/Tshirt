@@ -27,6 +27,7 @@ export interface Product {
   name: string;
   description: string | null;
   basePrice: string;
+  supplierId: string | null;
   lotNumber: string | null;
   isActive: boolean;
   createdAt: string;
