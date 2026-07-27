@@ -44,10 +44,11 @@ export const Navbar = () => {
         style={{ scaleX: scrollYProgress }}
       />
       <nav className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
-        <Link href="/" className="group" onClick={() => setMobileOpen(false)}>
-          <span className="font-display text-2xl md:text-3xl tracking-tight text-black font-bold leading-none">
+        <Link href="/" className="group flex flex-col items-center" onClick={() => setMobileOpen(false)}>
+          <span className="font-display text-3xl md:text-4xl tracking-[0.15em] text-black font-bold leading-none group-hover:scale-105 transition-transform duration-300">
             APAN
           </span>
+          <span className="text-[10px] tracking-[0.3em] uppercase text-black/60 -mt-1">Fashion</span>
         </Link>
 
         <div className="hidden md:flex gap-8 items-center">
