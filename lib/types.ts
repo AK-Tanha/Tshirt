@@ -116,3 +116,24 @@ export interface Invoice {
  status: 'paid' | 'unpaid';
  issuedAt: string;
 }
+
+export interface User {
+  userId: string;
+  phone: string;
+  role: 'USER' | 'ADMIN';
+}
+
+export interface AuthResponse {
+  access_token: string;
+}
+
+export interface RegisterPayload {
+  name: string;
+  phone: string;
+  password: string;
+}
+
+export interface LoginPayload {
+  phone: string;
+  password: string;
+}

@@ -12,6 +12,7 @@ import { ShoppingBag, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useProducts } from "@/hooks/use-products";
 import { useCategories } from "@/hooks/use-categories";
+import { useAuthStore } from "@/stores/auth-store";
 
 export const Navbar = () => {
   const { state } = useCart();
@@ -30,6 +31,7 @@ export const Navbar = () => {
     limit: 100,
   });
   const products = productsResult?.data ?? [];
+  const { user, isHydrated, logout } = useAuthStore();
 
   return (
     <motion.header
@@ -44,11 +46,17 @@ export const Navbar = () => {
         style={{ scaleX: scrollYProgress }}
       />
       <nav className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
-        <Link href="/" className="group flex flex-col items-center" onClick={() => setMobileOpen(false)}>
+        <Link
+          href="/"
+          className="group flex flex-col items-center"
+          onClick={() => setMobileOpen(false)}
+        >
           <span className="font-display text-3xl md:text-4xl tracking-[0.15em] text-black font-bold leading-none group-hover:scale-105 transition-transform duration-300">
             APAN
           </span>
-          <span className="text-[10px] tracking-[0.3em] uppercase text-black/60 -mt-1">Fashion</span>
+          <span className="text-[10px] tracking-[0.3em] uppercase text-black/60 -mt-1">
+            Fashion
+          </span>
         </Link>
 
         <div className="hidden md:flex gap-8 items-center">
@@ -134,6 +142,23 @@ export const Navbar = () => {
               {state.items.length}
             </motion.span>
           </Link>
+
+          {isHydrated &&
+            (user ? (
+              <button
+                onClick={logout}
+                className="font-body text-xs uppercase tracking-widest text-muted hover:text-black transition-colors"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="font-body text-xs uppercase tracking-widest text-muted hover:text-black transition-colors"
+              >
+                Login
+              </Link>
+            ))}
         </div>
 
         <button

@@ -1,16 +1,19 @@
-// stores/auth-store.ts — Zustand, client-only state
 import { create } from 'zustand';
+import { User } from '@/lib/types';
 
 interface AuthState {
-  user: { userId: string; phone: string; role: string } | null;
+  user: User | null;
   token: string | null;
-  setAuth: (user: AuthState['user'], token: string) => void;
+  isHydrated: boolean; // true once we've checked localStorage on app load
+  setAuth: (user: User, token: string) => void;
   logout: () => void;
+  setHydrated: (hydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
+  isHydrated: false,
   setAuth: (user, token) => {
     localStorage.setItem('access_token', token);
     set({ user, token });
@@ -19,4 +22,5 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem('access_token');
     set({ user: null, token: null });
   },
+  setHydrated: (hydrated) => set({ isHydrated: hydrated }),
 }));

@@ -17,7 +17,7 @@ export const suppliers: Supplier[] = [
 ];
 
 export const variants: ProductVariant[] = [
- { id: 'v1', productId: 'p1', size: 'S', color: 'Navy', sku: 'POL-NVY-S', stockQuantity: 8 },
+ { id: 'v1', productId: 'p1', size: 'S', color: 'Navy', sku: 'POL-NVY-S', stockQuantity: 8,  },
  { id: 'v2', productId: 'p1', size: 'M', color: 'Navy', sku: 'POL-NVY-M', stockQuantity: 10 },
  { id: 'v3', productId: 'p1', size: 'L', color: 'Navy', sku: 'POL-NVY-L', stockQuantity: 5 },
  { id: 'v4', productId: 'p1', size: 'XL', color: 'Navy', sku: 'POL-NVY-XL', stockQuantity: 3 },
