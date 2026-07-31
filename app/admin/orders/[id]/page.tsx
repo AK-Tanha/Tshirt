@@ -46,7 +46,7 @@ function generateInvoiceNo() {
 function createInvoice(order: Order): Invoice {
  const items: InvoiceItem[] = order.items.map((item) => {
  const product = productMap[item.productId];
- const unitPrice = product?.price ?? 0;
+ const unitPrice = product?.basePrice ?? 0;
  return { productId: item.productId, productName: product?.name ?? item.productId, quantity: item.quantity, unitPrice, total: unitPrice * item.quantity };
  });
  const subtotal = items.reduce((s, i) => s + i.total, 0);
