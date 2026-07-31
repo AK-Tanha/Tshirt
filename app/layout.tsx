@@ -30,14 +30,14 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <QueryProvider>
-          <CartProvider>
-            <AppShell>
-              <AuthProvider>{children}</AuthProvider>
-            </AppShell>
-            <script
-              dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }}
-            />
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <AppShell>{children}</AppShell>
+              <script
+                dangerouslySetInnerHTML={{ __html: `/* Facebook Pixel Code */` }}
+              />
+            </CartProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

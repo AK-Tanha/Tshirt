@@ -137,3 +137,17 @@ export interface LoginPayload {
   phone: string;
   password: string;
 }
+
+export interface CartItem {
+  id: string;
+  quantity: number;
+  productId: string;
+  variantId: string;
+  product: Product;
+  variant: ProductVariant;
+}
+
+export interface Cart {
+  id: string;
+  items: CartItem[];
+}

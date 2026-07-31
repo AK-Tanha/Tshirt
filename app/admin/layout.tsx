@@ -1,12 +1,19 @@
-'use client';
+"use client";
 
-import { ToastProvider } from '@/components/ui/Toast';
-import AdminShell from '@/components/admin/AdminShell';
+import { ToastProvider } from "@/components/ui/Toast";
+import AdminShell from "@/components/admin/AdminShell";
+import { RequireRole } from "@/components/RequireRole";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-  <ToastProvider>
-  <AdminShell>{children}</AdminShell>
-  </ToastProvider>
+    <ToastProvider>
+      <RequireRole role="ADMIN">
+        <AdminShell>{children}</AdminShell>
+      </RequireRole>
+    </ToastProvider>
   );
 }

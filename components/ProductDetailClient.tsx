@@ -14,18 +14,24 @@ import {
   Plus,
   ChevronLeft,
 } from "lucide-react";
+import { useAddToCart } from '@/hooks/use-cart';
 
 export const ProductDetailClient = ({ product }: { product: Product }) => {
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [quantity, setQuantity] = useState(1);
   const { dispatch } = useCart();
-
+  const addToCart = useAddToCart();
+  
   const handleAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: { productId: product.id, quantity },
-    });
-  };
+  const selectedVariant = product.variants.find((v) => v.size === selectedSize);
+  if (!selectedVariant) return;
+
+  addToCart.mutate({
+    productId: product.id,
+    variantId: selectedVariant.id,
+    quantity,
+  });
+};
 
   return (
     <div className="grid lg:grid-cols-12 gap-6 md:gap-12">
