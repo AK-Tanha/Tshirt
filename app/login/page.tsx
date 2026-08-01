@@ -14,7 +14,11 @@ export default function LoginPage() {
     e.preventDefault();
     mutate(
       { phone, password },
-      { onSuccess: () => router.push('/') },
+      {
+        onSuccess: ({ user }) => {
+          router.push(user.role === 'ADMIN' ? '/admin' : '/');
+        },
+      },
     );
   };
 

@@ -8,10 +8,11 @@ export function useRegister() {
   const setAuth = useAuthStore((s) => s.setAuth);
 
   return useMutation({
-    mutationFn: (payload: RegisterPayload) => register(payload),
-    onSuccess: async (data) => {
+    mutationFn: async (payload: RegisterPayload) => {
+      const data = await register(payload);
       const user = await getMe(); // token isn't attached to headers until stored, so fetch user after
       setAuth(user, data.access_token);
+      return { user, access_token: data.access_token };
     },
   });
 }
@@ -20,12 +21,13 @@ export function useLogin() {
   const setAuth = useAuthStore((s) => s.setAuth);
 
   return useMutation({
-    mutationFn: (payload: LoginPayload) => login(payload),
-    onSuccess: async (data) => {
+    mutationFn: async (payload: LoginPayload) => {
+      const data = await login(payload);
       // temporarily set token so apiFetch can use it for the /auth/me call
       localStorage.setItem('access_token', data.access_token);
       const user = await getMe();
       setAuth(user, data.access_token);
+      return { user, access_token: data.access_token };
     },
   });
 }

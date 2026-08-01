@@ -15,7 +15,11 @@ export default function RegisterPage() {
     e.preventDefault();
     mutate(
       { name, phone, password },
-      { onSuccess: () => router.push('/') },
+      {
+        onSuccess: ({ user }) => {
+          router.push(user.role === 'ADMIN' ? '/admin' : '/');
+        },
+      },
     );
   };
 
