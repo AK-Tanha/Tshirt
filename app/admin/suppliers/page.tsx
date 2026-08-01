@@ -1,38 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import type { ElementType } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { suppliers as initialSuppliers, products as allProducts } from '@/lib/data';
+import { useSuppliers } from '@/hooks/use-suppliers';
 import type { Supplier } from '@/lib/types';
-import { useToast } from '@/components/ui/Toast';
 import {
  Search, Building2, Plus, X, Mail, Phone, MapPin,
- Package, Calendar, CheckCircle, XCircle, Edit3,
+ Package, Calendar, CheckCircle, XCircle,
 } from 'lucide-react';
 
 export default function AdminSuppliers() {
- const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+ const { data: suppliers = [], isLoading } = useSuppliers();
  const [search, setSearch] = useState('');
  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
- const { toast } = useToast();
-
- useEffect(() => {
- const stored = JSON.parse(sessionStorage.getItem('new_suppliers') || '[]');
- if (stored.length > 0) {
- toast(`${stored.length} new supplier${stored.length > 1 ? 's' : ''} loaded`, 'info');
- }
- setSuppliers([...stored, ...initialSuppliers]);
- sessionStorage.removeItem('new_suppliers');
- }, []);
 
  const filtered = suppliers.filter((s) => {
  const q = search.toLowerCase();
  return (
  s.name.toLowerCase().includes(q) ||
- s.contactPerson.toLowerCase().includes(q) ||
- s.email.toLowerCase().includes(q)
+ s.phone.toLowerCase().includes(q) ||
+ (s.email ?? '').toLowerCase().includes(q)
  );
  });
 
@@ -59,21 +49,21 @@ export default function AdminSuppliers() {
  />
  <SupplierStatCard
  title="Active"
- value={suppliers.filter((s) => s.status === 'active').length.toString()}
+ value={suppliers.filter((s) => s.isActive).length.toString()}
  subtitle="currently supplying"
  icon={CheckCircle}
  color="bg-emerald-100 text-emerald-700"
  />
  <SupplierStatCard
  title="Inactive"
- value={suppliers.filter((s) => s.status === 'inactive').length.toString()}
+ value={suppliers.filter((s) => !s.isActive).length.toString()}
  subtitle="not supplying"
  icon={XCircle}
  color="bg-red-100 text-red-700"
  />
  <SupplierStatCard
- title="Products Supplied"
- value={allProducts.length.toString()}
+ title="Purchase Orders"
+ value={suppliers.reduce((sum, s) => sum + (s._count?.purchaseOrders ?? 0), 0).toString()}
  subtitle="across all suppliers"
  icon={Package}
  color="bg-blue-100 text-blue-600"
@@ -84,7 +74,7 @@ export default function AdminSuppliers() {
  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
  <input
  type="text"
- placeholder="Search by supplier name, contact person, or email..."
+ placeholder="Search by supplier name, or email..."
  value={search}
  onChange={(e) => setSearch(e.target.value)}
  className="w-full pl-9 pr-4 py-2.5 bg-neutral-100 border-none rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-300 transition-all placeholder:text-neutral-400"
@@ -97,43 +87,34 @@ export default function AdminSuppliers() {
  <thead>
  <tr className="text-left text-xs text-neutral-500 uppercase tracking-wider bg-neutral-50 ">
  <th className="p-4 font-medium">Supplier</th>
- <th className="p-4 font-medium">Contact Person</th>
  <th className="p-4 font-medium">Phone</th>
- <th className="p-4 font-medium">Categories</th>
- <th className="p-4 font-medium">Products</th>
+ <th className="p-4 font-medium">Purchase Orders</th>
  <th className="p-4 font-medium">Status</th>
  <th className="p-4 font-medium w-10"></th>
  </tr>
  </thead>
  <tbody>
- {filtered.map((s) => {
- const supplierProducts = allProducts.filter((p) => p.supplierId === s.id);
- return (
+ {isLoading && (
+ <tr>
+ <td colSpan={5} className="p-12 text-center text-neutral-500 text-sm">Loading suppliers...</td>
+ </tr>
+ )}
+ {filtered.map((s) => (
  <tr key={s.id} className="border-t border-border text-sm hover:bg-neutral-50 transition-colors cursor-pointer" onClick={() => setSelectedSupplier(s)}>
  <td className="p-4">
  <div>
  <p className="font-medium">{s.name}</p>
- <p className="text-xs text-neutral-500">{s.email}</p>
+ <p className="text-xs text-neutral-500">{s.email ?? '—'}</p>
  </div>
  </td>
- <td className="p-4">{s.contactPerson}</td>
  <td className="p-4 text-neutral-500">{s.phone}</td>
- <td className="p-4">
- <div className="flex gap-1.5">
- {s.supplyCategories.map((cat) => (
- <span key={cat} className="text-[10px] font-medium bg-neutral-100 px-2 py-0.5 rounded-md capitalize">
- {cat === 'tshirt' ? 'T-Shirt' : cat}
- </span>
- ))}
- </div>
- </td>
- <td className="p-4 font-mono text-xs text-neutral-500">{supplierProducts.length}</td>
+ <td className="p-4 font-mono text-xs text-neutral-500">{s._count?.purchaseOrders ?? 0}</td>
  <td className="p-4">
  <span className={cn(
  "text-[11px] font-medium px-2.5 py-1 rounded-full",
- s.status === 'active' ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700",
+ s.isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700",
  )}>
- {s.status === 'active' ? 'Active' : 'Inactive'}
+ {s.isActive ? 'Active' : 'Inactive'}
  </span>
  </td>
  <td className="p-4">
@@ -142,11 +123,10 @@ export default function AdminSuppliers() {
  </span>
  </td>
  </tr>
- );
- })}
- {filtered.length === 0 && (
+ ))}
+ {!isLoading && filtered.length === 0 && (
  <tr>
- <td colSpan={7} className="p-12 text-center text-neutral-500 text-sm">No suppliers found</td>
+ <td colSpan={5} className="p-12 text-center text-neutral-500 text-sm">No suppliers found</td>
  </tr>
  )}
  </tbody>
@@ -155,9 +135,7 @@ export default function AdminSuppliers() {
  </div>
 
  <div className="md:hidden space-y-3">
- {filtered.map((s) => {
- const supplierProducts = allProducts.filter((p) => p.supplierId === s.id);
- return (
+ {filtered.map((s) => (
  <div
  key={s.id}
  className="bg-white rounded-xl border border-border p-4 space-y-3 cursor-pointer"
@@ -166,29 +144,21 @@ export default function AdminSuppliers() {
  <div className="flex items-start justify-between">
  <div>
  <p className="text-sm font-medium">{s.name}</p>
- <p className="text-xs text-neutral-500">{s.contactPerson}</p>
+ <p className="text-xs text-neutral-500">{s.email ?? '—'}</p>
  </div>
  <span className={cn(
  "text-[11px] font-medium px-2.5 py-1 rounded-full",
- s.status === 'active' ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700",
+ s.isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700",
  )}>
- {s.status === 'active' ? 'Active' : 'Inactive'}
+ {s.isActive ? 'Active' : 'Inactive'}
  </span>
  </div>
  <div className="flex items-center gap-3 text-xs text-neutral-500">
  <span>{s.phone}</span>
- <span>{supplierProducts.length} product{supplierProducts.length !== 1 ? 's' : ''}</span>
+ <span>{s._count?.purchaseOrders ?? 0} purchase order{s._count?.purchaseOrders !== 1 ? 's' : ''}</span>
  </div>
- <div className="flex gap-1.5">
- {s.supplyCategories.map((cat) => (
- <span key={cat} className="text-[10px] font-medium bg-neutral-100 px-2 py-0.5 rounded-md capitalize">
- {cat === 'tshirt' ? 'T-Shirt' : cat}
- </span>
+ </div>
  ))}
- </div>
- </div>
- );
- })}
  {filtered.length === 0 && (
  <div className="bg-white rounded-xl border border-border p-12 text-center text-neutral-500 text-sm">No suppliers found</div>
  )}
@@ -207,8 +177,6 @@ export default function AdminSuppliers() {
 }
 
 function SupplierDetailDrawer({ supplier, onClose }: { supplier: Supplier; onClose: () => void }) {
- const supplierProducts = allProducts.filter((p) => p.supplierId === supplier.id);
-
  return (
  <motion.div
  initial={{ opacity: 0 }}
@@ -243,7 +211,7 @@ function SupplierDetailDrawer({ supplier, onClose }: { supplier: Supplier; onClo
  </div>
  <div className="min-w-0">
  <p className="text-xs text-neutral-500">Email</p>
- <p className="text-sm font-medium truncate">{supplier.email}</p>
+ <p className="text-sm font-medium truncate">{supplier.email ?? '—'}</p>
  </div>
  </div>
  <div className="flex items-center gap-3">
@@ -261,7 +229,7 @@ function SupplierDetailDrawer({ supplier, onClose }: { supplier: Supplier; onClo
  </div>
  <div>
  <p className="text-xs text-neutral-500">Address</p>
- <p className="text-sm font-medium">{supplier.address}</p>
+ <p className="text-sm font-medium">{supplier.address ?? '—'}</p>
  </div>
  </div>
  </div>
@@ -273,52 +241,30 @@ function SupplierDetailDrawer({ supplier, onClose }: { supplier: Supplier; onClo
  </div>
  <span className={cn(
  "text-[11px] font-medium px-2.5 py-1 rounded-full",
- supplier.status === 'active' ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700",
+ supplier.isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700",
  )}>
- {supplier.status === 'active' ? 'Active' : 'Inactive'}
+ {supplier.isActive ? 'Active' : 'Inactive'}
  </span>
- </div>
-
- <div>
- <h3 className="text-xs text-neutral-500 uppercase tracking-wider font-medium mb-3">Supply Categories</h3>
- <div className="flex gap-2">
- {supplier.supplyCategories.map((cat) => (
- <span key={cat} className="text-xs font-medium bg-neutral-900 text-white px-3 py-1.5 rounded-lg capitalize">
- {cat === 'tshirt' ? 'T-Shirt' : cat}
- </span>
- ))}
- </div>
  </div>
 
  <div>
  <div className="flex items-center justify-between mb-3">
  <h3 className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
- Products Supplied ({supplierProducts.length})
+ Purchase Orders ({supplier._count?.purchaseOrders ?? 0})
  </h3>
- <Link
- href="/admin/products"
- onClick={onClose}
- className="text-xs text-neutral-500 hover:text-neutral-900 transition-colors"
- >
- View all
- </Link>
  </div>
+ {supplier.purchaseOrders && supplier.purchaseOrders.length > 0 ? (
  <div className="space-y-2">
- {supplierProducts.map((p) => (
- <Link
- key={p.id}
- href={`/admin/products/${p.id}`}
- onClick={onClose}
- className="flex items-center justify-between px-4 py-3 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
- >
- <span className="text-sm font-medium">{p.name}</span>
- <span className="text-xs text-neutral-500 font-mono">৳{p.price.toLocaleString()}</span>
- </Link>
- ))}
- {supplierProducts.length === 0 && (
- <p className="text-sm text-neutral-500">No products currently assigned</p>
- )}
+ {supplier.purchaseOrders.map((po) => (
+ <div key={po.id} className="flex items-center justify-between px-4 py-3 bg-neutral-100 rounded-lg">
+ <span className="text-sm font-medium">PO #{po.id.slice(0, 8)}</span>
+ <span className="text-xs text-neutral-500 font-mono">৳{Number(po.totalCost).toLocaleString()}</span>
  </div>
+ ))}
+ </div>
+ ) : (
+ <p className="text-sm text-neutral-500">No purchase orders yet</p>
+ )}
  </div>
 
  <div className="flex gap-3 pt-2">
@@ -328,9 +274,6 @@ function SupplierDetailDrawer({ supplier, onClose }: { supplier: Supplier; onClo
  >
  Close
  </button>
- <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors">
- <Edit3 className="w-3.5 h-3.5" /> Edit Supplier
- </button>
  </div>
  </div>
  </motion.div>
@@ -339,7 +282,7 @@ function SupplierDetailDrawer({ supplier, onClose }: { supplier: Supplier; onClo
 }
 
 function SupplierStatCard({ title, value, subtitle, icon: Icon, color }: {
- title: string; value: string; subtitle: string; icon: React.ElementType; color: string;
+ title: string; value: string; subtitle: string; icon: ElementType; color: string;
 }) {
  return (
  <motion.div

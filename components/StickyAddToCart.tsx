@@ -24,7 +24,7 @@ export const StickyAddToCart = ({ product }: { product: Product }) => {
  <div className="flex justify-between items-center gap-4">
  <div className="flex flex-col min-w-0">
  <span className="font-display text-base text-black truncate font-bold">{product.name}</span>
- <span className="font-body text-sm text-black/60">৳{product.price}</span>
+  <span className="font-body text-sm text-black/60">৳{Number(product.basePrice).toLocaleString()}</span>
  </div>
  <button
  onClick={() => dispatch({ type: 'ADD_ITEM', payload: { productId: product.id, quantity: 1 } })}

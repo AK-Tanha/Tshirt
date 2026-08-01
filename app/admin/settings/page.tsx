@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/Toast';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -16,6 +16,15 @@ const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
  { key: 'email', label: 'Email', icon: Mail },
 ];
 
+function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+ return (
+ <label className="relative inline-flex items-center cursor-pointer">
+ <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only peer" />
+ <div className="w-10 h-5 bg-neutral-200 rounded-full peer peer-checked:bg-neutral-900 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" />
+ </label>
+ );
+}
+
 function loadSettings() {
  if (typeof window === 'undefined') return null;
  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch { return null; }
@@ -23,42 +32,21 @@ function loadSettings() {
 
 export default function AdminSettings() {
  const [tab, setTab] = useState<Tab>('general');
- const [storeName, setStoreName] = useState('Apan Apparel');
- const [storeEmail, setStoreEmail] = useState('hello@apanapparel.com');
- const [storePhone, setStorePhone] = useState('+880 1700-000000');
- const [storeAddress, setStoreAddress] = useState('Dhaka, Bangladesh');
- const [currency, setCurrency] = useState('BDT');
- const [codEnabled, setCodEnabled] = useState(true);
- const [orderNotification, setOrderNotification] = useState(true);
- const [stockAlert, setStockAlert] = useState(true);
+ const [storeName, setStoreName] = useState(() => loadSettings()?.storeName ?? 'Apan Apparel');
+ const [storeEmail, setStoreEmail] = useState(() => loadSettings()?.storeEmail ?? 'hello@apanapparel.com');
+ const [storePhone, setStorePhone] = useState(() => loadSettings()?.storePhone ?? '+880 1700-000000');
+ const [storeAddress, setStoreAddress] = useState(() => loadSettings()?.storeAddress ?? 'Dhaka, Bangladesh');
+ const [currency, setCurrency] = useState(() => loadSettings()?.currency ?? 'BDT');
+ const [codEnabled, setCodEnabled] = useState(() => loadSettings()?.codEnabled ?? true);
+ const [orderNotification, setOrderNotification] = useState(() => loadSettings()?.orderNotification ?? true);
+ const [stockAlert, setStockAlert] = useState(() => loadSettings()?.stockAlert ?? true);
  const { toast } = useToast();
-
- useEffect(() => {
- const saved = loadSettings();
- if (saved) {
- setStoreName(saved.storeName ?? 'Apan Apparel');
- setStoreEmail(saved.storeEmail ?? 'hello@apanapparel.com');
- setStorePhone(saved.storePhone ?? '+880 1700-000000');
- setStoreAddress(saved.storeAddress ?? 'Dhaka, Bangladesh');
- setCurrency(saved.currency ?? 'BDT');
- setCodEnabled(saved.codEnabled ?? true);
- setOrderNotification(saved.orderNotification ?? true);
- setStockAlert(saved.stockAlert ?? true);
- }
- }, []);
 
  const handleSave = () => {
  const settings = { storeName, storeEmail, storePhone, storeAddress, currency, codEnabled, orderNotification, stockAlert };
  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
  toast('Settings saved successfully');
  };
-
- const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
- <label className="relative inline-flex items-center cursor-pointer">
- <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only peer" />
- <div className="w-10 h-5 bg-neutral-200 rounded-full peer peer-checked:bg-neutral-900 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" />
- </label>
- );
 
  return (
  <div className="space-y-6 max-w-4xl">

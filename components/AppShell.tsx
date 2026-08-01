@@ -7,8 +7,9 @@ import { Footer } from './Footer';
 export function AppShell({ children }: { children: React.ReactNode }) {
  const pathname = usePathname();
  const isAdmin = pathname.startsWith('/admin');
+ const isAuth = pathname === '/login' || pathname === '/register';
 
- if (isAdmin) return <>{children}</>;
+ if (isAdmin || isAuth) return <>{children}</>;
 
  return (
  <>

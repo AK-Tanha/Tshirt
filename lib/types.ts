@@ -1,17 +1,36 @@
-//export type Category = 'polo' | 'tshirt';
+// ============================================================================
+// Types aligned with the Apan-Backend (NestJS + Prisma) API contract.
+// All Decimal fields (basePrice, price, totalAmount, etc.) serialize as strings.
+// ============================================================================
 
-export interface ProductVariant {
-  id: string;
-  size: string;
-  color: string;
-  stock: number;
-  price: string | null; // Prisma Decimal serializes as string over JSON
+// ----------------------------------------------------------------------------
+// Auth
+// ----------------------------------------------------------------------------
+
+export interface User {
+  userId: string;
+  phone: string;
+  role: 'USER' | 'ADMIN';
 }
 
-export interface ProductImage {
-  id: string;
-  url: string;
+export interface AuthResponse {
+  access_token: string;
 }
+
+export interface RegisterPayload {
+  name: string;
+  phone: string;
+  password: string;
+}
+
+export interface LoginPayload {
+  phone: string;
+  password: string;
+}
+
+// ----------------------------------------------------------------------------
+// Categories
+// ----------------------------------------------------------------------------
 
 export interface Category {
   id: string;
@@ -22,15 +41,36 @@ export interface Category {
   };
 }
 
+// ----------------------------------------------------------------------------
+// Products
+// ----------------------------------------------------------------------------
+
+export interface ProductVariant {
+  id: string;
+  size: string;
+  color: string;
+  stock: number;
+  price: string | null; // Prisma Decimal serializes as string over JSON
+  costPrice?: string | null;
+  productId?: string;
+}
+
+export interface ProductImage {
+  id: string;
+  url: string;
+  productId?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string | null;
-  basePrice: string;
+  basePrice: string; // Prisma Decimal serializes as string over JSON
   supplierId: string | null;
   lotNumber: string | null;
   isActive: boolean;
   createdAt: string;
+  categoryId: string;
   category: Category;
   images: ProductImage[];
   variants: ProductVariant[];
@@ -57,90 +97,30 @@ export interface ProductQueryParams {
   limit?: number;
 }
 
-export interface Supplier {
- id: string;
- name: string;
- contactPerson: string;
- email: string;
- phone: string;
- address: string;
- status: 'active' | 'inactive';
- supplyCategories: string[];
- createdAt: string;
-}
-
-export interface ProductVariant {
- id: string;
- productId: string;
- //size: 'S' | 'M' | 'L' | 'XL' | 'XXL';
- color: string;
- sku: string;
- stockQuantity: number;
-}
-
-export interface CartItem {
- productId: string;
- quantity: number;
-}
-
-export interface Order {
- id: string;
- customerName: string;
- phone: string;
- address: string;
- items: CartItem[];
- totalAmount: number;
- paymentMethod: 'cod';
- status: 'pending_confirmation' | 'confirmed' | 'shipped' | 'delivered' | 'returned';
- createdAt: string;
-}
-
-export interface InvoiceItem {
- productId: string;
- productName: string;
- quantity: number;
- unitPrice: number;
- total: number;
-}
-
-export interface Invoice {
- invoiceNo: string;
- orderId: string;
- customerName: string;
- phone: string;
- address: string;
- items: InvoiceItem[];
- subtotal: number;
- tax: number;
- grandTotal: number;
- status: 'paid' | 'unpaid';
- issuedAt: string;
-}
-
-export interface User {
-  userId: string;
-  phone: string;
-  role: 'USER' | 'ADMIN';
-}
-
-export interface AuthResponse {
-  access_token: string;
-}
-
-export interface RegisterPayload {
+export interface CreateProductPayload {
   name: string;
-  phone: string;
-  password: string;
+  description?: string;
+  basePrice: number;
+  lotNumber?: string;
+  categoryId: string;
+  supplierId?: string;
+  imageUrls?: string[];
+  variants: {
+    size: string;
+    color: string;
+    stock: number;
+    price?: number;
+  }[];
 }
 
-export interface LoginPayload {
-  phone: string;
-  password: string;
-}
+// ----------------------------------------------------------------------------
+// Cart (server cart — auth required)
+// ----------------------------------------------------------------------------
 
 export interface CartItem {
   id: string;
   quantity: number;
+  cartId: string;
   productId: string;
   variantId: string;
   product: Product;
@@ -149,5 +129,166 @@ export interface CartItem {
 
 export interface Cart {
   id: string;
+  userId: string;
   items: CartItem[];
+}
+
+// Local (context) cart line item used before checkout
+export interface LocalCartItem {
+  productId: string;
+  quantity: number;
+}
+
+// ----------------------------------------------------------------------------
+// Orders
+// ----------------------------------------------------------------------------
+
+export type OrderStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED';
+
+export interface OrderItem {
+  id: string;
+  quantity: number;
+  price: string; // Decimal as string
+  orderId: string;
+  productId: string;
+  variantId: string;
+  product: Product;
+  variant: ProductVariant;
+}
+
+export interface Order {
+  id: string;
+  status: OrderStatus;
+  totalAmount: string; // Decimal as string
+  address: string;
+  phone: string;
+  createdAt: string;
+  userId: string;
+  items: OrderItem[];
+  user?: {
+    id: string;
+    name: string;
+    phone: string;
+    role: string;
+    address: string | null;
+    createdAt: string;
+  };
+}
+
+export interface CreateOrderPayload {
+  address: string;
+  phone: string;
+}
+
+// ----------------------------------------------------------------------------
+// Customers (admin)
+// ----------------------------------------------------------------------------
+
+export interface Customer {
+  id: string;
+  name: string;
+  phone: string;
+  address: string | null;
+  createdAt: string;
+  _count?: {
+    orders: number;
+  };
+  orders?: Order[];
+}
+
+// ----------------------------------------------------------------------------
+// Suppliers (admin)
+// ----------------------------------------------------------------------------
+
+export interface Supplier {
+  id: string;
+  name: string;
+  phone: string;
+  email: string | null;
+  address: string | null;
+  isActive: boolean;
+  createdAt: string;
+  _count?: {
+    purchaseOrders: number;
+  };
+  purchaseOrders?: PurchaseOrder[];
+}
+
+export interface CreateSupplierPayload {
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+}
+
+// ----------------------------------------------------------------------------
+// Purchase Orders (admin)
+// ----------------------------------------------------------------------------
+
+export type PurchaseOrderStatus =
+  | 'PENDING'
+  | 'ORDERED'
+  | 'RECEIVED'
+  | 'CANCELLED';
+
+export interface PurchaseOrderItem {
+  id: string;
+  quantity: number;
+  unitCost: string; // Decimal as string
+  purchaseOrderId: string;
+  variantId: string;
+  variant: ProductVariant;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  status: PurchaseOrderStatus;
+  totalCost: string; // Decimal as string
+  notes: string | null;
+  createdAt: string;
+  receivedAt: string | null;
+  supplierId: string;
+  supplier: Supplier;
+  items: PurchaseOrderItem[];
+}
+
+export interface CreatePurchaseOrderPayload {
+  supplierId: string;
+  notes?: string;
+  items: {
+    variantId: string;
+    quantity: number;
+    unitCost: number;
+  }[];
+}
+
+// ----------------------------------------------------------------------------
+// Invoice (admin — derived client-side)
+// ----------------------------------------------------------------------------
+
+export interface InvoiceItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+export interface Invoice {
+  invoiceNo: string;
+  orderId: string;
+  customerName: string;
+  phone: string;
+  address: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  tax: number;
+  grandTotal: number;
+  status: 'paid' | 'unpaid';
+  issuedAt: string;
 }

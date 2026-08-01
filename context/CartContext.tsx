@@ -1,13 +1,13 @@
 'use client';
 import { createContext, useContext, useReducer, ReactNode } from 'react';
-import { CartItem } from '@/lib/types';
+import { LocalCartItem } from '@/lib/types';
 
 interface CartState {
-  items: CartItem[];
+  items: LocalCartItem[];
 }
 
 type CartAction = 
-  | { type: 'ADD_ITEM'; payload: CartItem }
+  | { type: 'ADD_ITEM'; payload: LocalCartItem }
   | { type: 'REMOVE_ITEM'; payload: string }
   | { type: 'CLEAR_CART' };
 

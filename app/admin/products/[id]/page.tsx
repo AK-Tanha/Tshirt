@@ -1,66 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  products as initialProducts,
-  variants as initialVariants,
-  suppliers,
-} from "@/lib/data";
+import { useProduct } from "@/hooks/use-products";
+import { useSuppliers } from "@/hooks/use-suppliers";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
-import type { Product, ProductVariant, Supplier } from "@/lib/types";
 import {
   ArrowLeft,
   Edit3,
-  Package,
   ShoppingCart,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  ImageIcon,
-  Tag,
   Store,
-  BarChart3,
 } from "lucide-react";
 
-const categoryLabels: Record<string, string> = {
-  polo: "Polo",
-  tshirt: "T-Shirt",
-};
-const supplierMap = Object.fromEntries(suppliers.map((s) => [s.id, s]));
-
-function getStockInfo(variants: ProductVariant[]): {
+function getStockInfo(variants: { stock: number }[]): {
   label: string;
   variant: "success" | "warning" | "danger";
   total: number;
 } {
-  const total = variants.reduce((sum, v) => sum + v.stockQuantity, 0);
+  const total = variants.reduce((sum, v) => sum + v.stock, 0);
   if (total === 0) return { label: "Out of Stock", variant: "danger", total };
   if (total <= 10) return { label: "Low Stock", variant: "warning", total };
   return { label: "In Stock", variant: "success", total };
 }
 
 export default function ProductDetailPage() {
-  const params = useParams();
+  const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const { data: product, isLoading } = useProduct(params.id);
+  const { data: suppliers = [] } = useSuppliers();
   const [selectedImage, setSelectedImage] = useState<string>("");
 
-  useEffect(() => {
-    const stored = JSON.parse(sessionStorage.getItem("new_products") || "[]");
-    const all = [...stored, ...initialProducts];
-    const found = all.find((p: Product) => p.id === params.id);
-    if (found) {
-      setProduct(found);
-      setSelectedImage(found.heroImage);
-      setVariants(initialVariants.filter((v) => v.productId === found.id));
-    }
-  }, [params.id]);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-neutral-500">Loading product...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -70,10 +50,9 @@ export default function ProductDetailPage() {
     );
   }
 
-  const stock = getStockInfo(variants);
-  const supplier = supplierMap[product.supplierId ?? ""] as
-    | Supplier
-    | undefined;
+  const stock = getStockInfo(product.variants);
+  const supplier = suppliers.find((s) => s.id === product.supplierId);
+  const currentImage = selectedImage || product.images[0]?.url || "";
 
   return (
     <div className="space-y-6">
@@ -93,7 +72,7 @@ export default function ProductDetailPage() {
               <Badge variant={stock.variant}>{stock.label}</Badge>
             </div>
             <p className="text-sm text-neutral-500 mt-1">
-              ID: {product.id} &middot; Slug: /{product.slug}
+              ID: {product.id}
             </p>
           </div>
         </div>
@@ -111,43 +90,33 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 <div className="relative aspect-square rounded-xl overflow-hidden bg-neutral-100 border border-border">
-                  <Image
-                    src={selectedImage}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                  />
+                  {currentImage ? (
+                    <Image
+                      src={currentImage}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-neutral-400 text-sm">
+                      No image
+                    </div>
+                  )}
                 </div>
-                {(product.extraImages?.length ?? 0) > 0 && (
+                {product.images.length > 0 && (
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => setSelectedImage(product.heroImage)}
-                      className={cn(
-                        "relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-colors",
-                        selectedImage === product.heroImage
-                          ? "border-neutral-900 "
-                          : "border-transparent",
-                      )}
-                    >
-                      <Image
-                        src={product.heroImage}
-                        alt=""
-                        fill
-                        className="object-cover"
-                      />
-                    </button>
-                    {product.extraImages?.map((img, i) => (
+                    {product.images.map((img) => (
                       <button
-                        key={i}
-                        onClick={() => setSelectedImage(img)}
+                        key={img.id}
+                        onClick={() => setSelectedImage(img.url)}
                         className={cn(
                           "relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-colors",
-                          selectedImage === img
+                          currentImage === img.url
                             ? "border-neutral-900 "
                             : "border-transparent",
                         )}
                       >
-                        <Image src={img} alt="" fill className="object-cover" />
+                        <Image src={img.url} alt="" fill className="object-cover" />
                       </button>
                     ))}
                   </div>
@@ -159,7 +128,7 @@ export default function ProductDetailPage() {
                     Category
                   </p>
                   <Badge variant="neutral" className="mt-1">
-                    {categoryLabels[product.category]}
+                    {product.category?.name ?? "—"}
                   </Badge>
                 </div>
                 <div>
@@ -167,7 +136,7 @@ export default function ProductDetailPage() {
                     Price
                   </p>
                   <p className="font-display text-3xl font-bold tracking-tight mt-1">
-                    ৳{product.price.toLocaleString()}
+                    ৳{Number(product.basePrice).toLocaleString()}
                   </p>
                 </div>
                 <div>
@@ -190,26 +159,22 @@ export default function ProductDetailPage() {
                   <tr className="text-left text-xs text-neutral-500 uppercase tracking-wider border-b border-border">
                     <th className="pb-3 font-medium">Size</th>
                     <th className="pb-3 font-medium">Color</th>
-                    <th className="pb-3 font-medium">SKU</th>
                     <th className="pb-3 font-medium text-right">Stock</th>
                     <th className="pb-3 font-medium text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {variants.map((v) => (
+                  {product.variants.map((v) => (
                     <tr key={v.id} className="border-b border-border/50">
                       <td className="py-3 font-medium">{v.size}</td>
                       <td className="py-3 text-neutral-500">{v.color}</td>
-                      <td className="py-3 font-mono text-xs text-neutral-500">
-                        {v.sku}
-                      </td>
                       <td className="py-3 text-right font-mono">
-                        {v.stockQuantity}
+                        {v.stock}
                       </td>
                       <td className="py-3 text-right">
-                        {v.stockQuantity === 0 ? (
+                        {v.stock === 0 ? (
                           <Badge variant="danger">Out</Badge>
-                        ) : v.stockQuantity <= 5 ? (
+                        ) : v.stock <= 5 ? (
                           <Badge variant="warning">Low</Badge>
                         ) : (
                           <Badge variant="success">OK</Badge>
@@ -217,10 +182,10 @@ export default function ProductDetailPage() {
                       </td>
                     </tr>
                   ))}
-                  {variants.length === 0 && (
+                  {product.variants.length === 0 && (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={4}
                         className="py-12 text-center text-sm text-neutral-500"
                       >
                         No variants configured
@@ -239,17 +204,19 @@ export default function ProductDetailPage() {
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Status</span>
-                <Badge variant="success">Active</Badge>
+                <Badge variant={product.isActive ? "success" : "neutral"}>
+                  {product.isActive ? "Active" : "Inactive"}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Category</span>
                 <span className="font-medium">
-                  {categoryLabels[product.category]}
+                  {product.category?.name ?? "—"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Variants</span>
-                <span className="font-medium">{variants.length}</span>
+                <span className="font-medium">{product.variants.length}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Total Stock</span>
@@ -258,13 +225,7 @@ export default function ProductDetailPage() {
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Price</span>
                 <span className="font-mono font-medium">
-                  ৳{product.price.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-500">Slug</span>
-                <span className="text-right text-xs font-mono text-neutral-500">
-                  /{product.slug}
+                  ৳{Number(product.basePrice).toLocaleString()}
                 </span>
               </div>
             </div>
@@ -280,14 +241,9 @@ export default function ProductDetailPage() {
               </div>
               <div className="space-y-2 text-sm">
                 <p className="font-medium">{supplier.name}</p>
-                <p className="text-xs text-neutral-500">
-                  {supplier.contactPerson}
-                </p>
                 <p className="text-xs text-neutral-500">{supplier.phone}</p>
-                <Badge
-                  variant={supplier.status === "active" ? "success" : "danger"}
-                >
-                  {supplier.status === "active" ? "Active" : "Inactive"}
+                <Badge variant={supplier.isActive ? "success" : "neutral"}>
+                  {supplier.isActive ? "Active" : "Inactive"}
                 </Badge>
               </div>
             </Card>
@@ -303,7 +259,7 @@ export default function ProductDetailPage() {
                 <Edit3 className="w-4 h-4" /> Edit Product
               </Link>
               <Link
-                href={`/products/${product.slug}`}
+                href={`/products/${product.id}`}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-neutral-100 transition-colors"
               >
                 <ShoppingCart className="w-4 h-4" /> View on Store

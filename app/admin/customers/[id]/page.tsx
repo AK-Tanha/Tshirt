@@ -2,30 +2,38 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Mail, Phone, Calendar, ShoppingBag, TrendingUp, Package, Plus } from 'lucide-react';
-import { customers, orders } from '@/lib/admin-data';
+import { ArrowLeft, Phone, Calendar, ShoppingBag, TrendingUp, Package } from 'lucide-react';
+import { useCustomer } from '@/hooks/use-customers';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
 const statusBadge: Record<string, 'warning' | 'info' | 'neutral' | 'success' | 'danger'> = {
-  pending_confirmation: 'warning',
-  confirmed: 'info',
-  shipped: 'neutral',
-  delivered: 'success',
-  returned: 'danger',
+  PENDING: 'warning',
+  CONFIRMED: 'info',
+  SHIPPED: 'neutral',
+  DELIVERED: 'success',
+  CANCELLED: 'danger',
 };
 
 const statusLabels: Record<string, string> = {
-  pending_confirmation: 'Pending',
-  confirmed: 'Confirmed',
-  shipped: 'Shipped',
-  delivered: 'Delivered',
-  returned: 'Returned',
+  PENDING: 'Pending',
+  CONFIRMED: 'Confirmed',
+  SHIPPED: 'Shipped',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
 };
 
 export default function CustomerDetail() {
   const { id } = useParams<{ id: string }>();
-  const customer = customers.find((c) => c.id === id);
+  const { data: customer, isLoading } = useCustomer(id);
+
+  if (isLoading) {
+    return (
+      <Card className="p-12 text-center">
+        <p className="text-neutral-500">Loading customer...</p>
+      </Card>
+    );
+  }
 
   if (!customer) {
     return (
@@ -40,31 +48,23 @@ export default function CustomerDetail() {
     );
   }
 
-  const customerOrders = orders.filter((o) => o.customerName === customer.name);
+  const customerOrders = customer.orders ?? [];
+  const totalSpent = customerOrders.reduce((s, o) => s + Number(o.totalAmount), 0);
   const avgOrderValue = customerOrders.length > 0
-    ? Math.round(customer.totalSpent / customerOrders.length)
+    ? Math.round(totalSpent / customerOrders.length)
     : 0;
 
   const stats = [
-    { label: 'Total Orders', value: customer.totalOrders, icon: Package },
-    { label: 'Total Spent', value: `৳${customer.totalSpent.toLocaleString()}`, icon: TrendingUp },
+    { label: 'Total Orders', value: customerOrders.length, icon: Package },
+    { label: 'Total Spent', value: `৳${totalSpent.toLocaleString()}`, icon: TrendingUp },
     { label: 'Avg. Order Value', value: `৳${avgOrderValue.toLocaleString()}`, icon: ShoppingBag },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Link href="/admin/customers" className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Customers
-        </Link>
-        <Link
-          href={`/admin/orders/create?name=${encodeURIComponent(customer.name)}&phone=${encodeURIComponent(customer.phone)}`}
-          className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">Create Order</span>
-        </Link>
-      </div>
+      <Link href="/admin/customers" className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Back to Customers
+      </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1 p-6">
@@ -73,21 +73,14 @@ export default function CustomerDetail() {
               {customer.name.charAt(0)}
             </div>
             <h2 className="font-display text-xl font-bold">{customer.name}</h2>
-            <Badge variant={customer.status === 'active' ? 'success' : 'neutral'} className="mt-1.5">
-              {customer.status === 'active' ? 'Active' : 'Inactive'}
-            </Badge>
             <div className="w-full space-y-3 mt-6 text-sm">
-              <div className="flex items-center gap-3 text-neutral-500">
-                <Mail className="w-4 h-4 shrink-0" />
-                <span className="truncate">{customer.email}</span>
-              </div>
               <div className="flex items-center gap-3 text-neutral-500">
                 <Phone className="w-4 h-4 shrink-0" />
                 <span className="font-mono">{customer.phone}</span>
               </div>
               <div className="flex items-center gap-3 text-neutral-500">
                 <Calendar className="w-4 h-4 shrink-0" />
-                <span>Joined {new Date(customer.joinDate).toLocaleDateString('en-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span>Joined {new Date(customer.createdAt).toLocaleDateString('en-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
               </div>
             </div>
           </div>
@@ -136,7 +129,7 @@ export default function CustomerDetail() {
                       <tr key={order.id} className="border-t border-border text-sm">
                         <td className="py-3 font-mono text-xs">#{order.id.slice(0, 8)}</td>
                         <td className="py-3 text-neutral-500">{order.items.length} item{order.items.length > 1 ? 's' : ''}</td>
-                        <td className="py-3 font-mono">৳{order.totalAmount.toLocaleString()}</td>
+                        <td className="py-3 font-mono">৳{Number(order.totalAmount).toLocaleString()}</td>
                         <td className="py-3"><Badge variant={statusBadge[order.status]}>{statusLabels[order.status]}</Badge></td>
                         <td className="py-3 text-xs text-neutral-500 hidden sm:table-cell">
                           {new Date(order.createdAt).toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric' })}

@@ -1,5 +1,3 @@
-import { Order } from './types';
-
 export const adminStats = {
  totalRevenue: 45250,
  totalOrders: 128,
@@ -39,7 +37,7 @@ export const categoryBreakdown = [
  { category: 'T-Shirts', count: 3, revenue: 47000, percentage: 35 },
 ];
 
-export const orders: Order[] = [
+export const orders = [
  { id: 'ord_001', customerName: 'Rafiq Hasan', phone: '01712345678', address: '42 Gulshan Avenue, Dhaka', items: [{ productId: 'p1', quantity: 2 }], totalAmount: 1700, paymentMethod: 'cod', status: 'delivered', createdAt: '2026-06-28T10:30:00Z' },
  { id: 'ord_002', customerName: 'Farhana Sultana', phone: '01798765432', address: '15 Banani Road, Dhaka', items: [{ productId: 't1', quantity: 1 }, { productId: 'p2', quantity: 1 }], totalAmount: 1500, paymentMethod: 'cod', status: 'shipped', createdAt: '2026-06-30T14:15:00Z' },
  { id: 'ord_003', customerName: 'Shahidul Islam', phone: '01655555555', address: '78 Uttara Sector 4, Dhaka', items: [{ productId: 'p3', quantity: 3 }], totalAmount: 3600, paymentMethod: 'cod', status: 'pending_confirmation', createdAt: '2026-07-01T09:45:00Z' },
