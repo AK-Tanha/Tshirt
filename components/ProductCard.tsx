@@ -1,4 +1,5 @@
 import { Product } from "@/lib/types";
+import { getHeroImage } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
@@ -8,36 +9,39 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
+  const hero = getHeroImage(product.images);
   return (
     <motion.div
-      whileHover={{ y: -6 }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       <Link
         href={`/products/${product.id}`}
-        className="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-500"
+        className="group block"
       >
-        <div className="relative aspect-[4/5] overflow-hidden bg-stone">
+        <div className="relative aspect-[4/5] rounded-xl md:rounded-2xl overflow-hidden bg-stone">
           <Image
-            src={product.images?.[0]?.url || "/placeholder.png"}
+            src={hero?.url || "/placeholder.png"}
             alt={product.name}
             fill
+            sizes="(max-width: 640px) 50vw, 25vw"
             className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {product.category?.name && (
+            <span className="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-sm text-ink font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] px-2.5 py-1 rounded-full">
+              {product.category.name}
+            </span>
+          )}
         </div>
-        <div className="p-3 md:p-4">
-          <h3 className="font-display text-sm md:text-lg text-black leading-tight tracking-tight font-bold">
+        <div className="pt-3 md:pt-4 px-0.5">
+          <h3 className="font-display text-sm md:text-lg text-ink leading-tight tracking-tight font-semibold line-clamp-1">
             {product.name}
           </h3>
           <div className="flex items-center gap-2 mt-1">
-            <p className="font-body text-[11px] md:text-xs text-muted">
-              {product?.category?.name}
-            </p>
-            <span className="text-muted/30">·</span>
-            <p className="font-body text-sm md:text-base text-black font-semibold">
-              ৳{product?.basePrice}
+            <p className="font-body text-sm md:text-base text-ink font-semibold">
+              ৳{Number(product.basePrice).toLocaleString()}
             </p>
           </div>
         </div>

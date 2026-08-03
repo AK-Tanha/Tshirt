@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono } from "next/font/google";
+import {
+  Inter,
+  IBM_Plex_Mono,
+  Fraunces,
+} from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { AppShell } from "@/components/AppShell";
@@ -11,6 +15,12 @@ const plex = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-mono",
+});
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +34,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plex.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${plex.variable} ${fraunces.variable}`}
+    >
       <body
         className="bg-white text-black font-body antialiased"
         suppressHydrationWarning

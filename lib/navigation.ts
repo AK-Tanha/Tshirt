@@ -31,17 +31,12 @@ export const navItems: NavItem[] = [
  { href: '/admin/inventory/purchase-orders', label: 'Purchase Orders' },
  ],
  },
- {
- label: 'Orders', icon: ClipboardList,
- children: [
- { href: '/admin/orders', label: 'All Orders' },
- { href: '/admin/orders?status=pending', label: 'Pending' },
- { href: '/admin/orders?status=processing', label: 'Processing' },
- { href: '/admin/orders?status=shipped', label: 'Shipped' },
- { href: '/admin/orders?status=delivered', label: 'Delivered' },
- { href: '/admin/orders?status=returned', label: 'Returns' },
- ],
- },
+{
+  label: 'Orders', icon: ClipboardList,
+  children: [
+  { href: '/admin/orders', label: 'All Orders' },
+  ],
+  },
  {
  label: 'Customers', icon: Users,
  children: [

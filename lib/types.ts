@@ -28,6 +28,26 @@ export interface LoginPayload {
   password: string;
 }
 
+// Full user record returned by the admin /users endpoints (password omitted)
+export interface UserRecord {
+  id: string;
+  name: string;
+  phone: string;
+  role: 'USER' | 'ADMIN';
+  address: string | null;
+  createdAt: string;
+  updatedAt?: string;
+  _count?: {
+    orders: number;
+  };
+  cart?: {
+    id: string;
+    userId: string;
+    _count: { items: number };
+  } | null;
+  orders?: Order[];
+}
+
 // ----------------------------------------------------------------------------
 // Categories
 // ----------------------------------------------------------------------------
@@ -53,11 +73,13 @@ export interface ProductVariant {
   price: string | null; // Prisma Decimal serializes as string over JSON
   costPrice?: string | null;
   productId?: string;
+  product?: Product;
 }
 
 export interface ProductImage {
   id: string;
   url: string;
+  isHero?: boolean;
   productId?: string;
 }
 
@@ -105,6 +127,7 @@ export interface CreateProductPayload {
   categoryId: string;
   supplierId?: string;
   imageUrls?: string[];
+  heroImageUrl?: string;
   variants: {
     size: string;
     color: string;

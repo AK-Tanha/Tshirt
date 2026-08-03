@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
  return (
  <>
  <Navbar />
- <div className="pt-14">{children}</div>
+ <div className="pt-14 md:pt-16">{children}</div>
  <Footer />
  </>
  );

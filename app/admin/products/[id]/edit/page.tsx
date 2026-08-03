@@ -10,6 +10,7 @@ import { useCategories } from '@/hooks/use-categories';
 import { Field, getInputClass } from '@/components/ui/Field';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardTitle } from '@/components/ui/Card';
+import { ImageDropzone } from '@/components/ImageDropzone';
 import { useToast } from '@/components/ui/Toast';
 import type { Product, Supplier, Category } from '@/lib/types';
 import {
@@ -76,6 +77,12 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
   const [categoryId, setCategoryId] = useState(product.categoryId ?? '');
   const [supplierId, setSupplierId] = useState(product.supplierId ?? '');
   const [variants, setVariants] = useState(product.variants);
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    product.images?.map((i) => i.url) ?? [],
+  );
+  const [heroUrl, setHeroUrl] = useState<string>(
+    product.images?.find((i) => i.isHero)?.url ?? product.images?.[0]?.url ?? '',
+  );
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
 
@@ -98,6 +105,8 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
           description,
           categoryId,
           supplierId: supplierId || undefined,
+          imageUrls,
+          ...(heroUrl && { heroImageUrl: heroUrl }),
         },
       },
       {
@@ -199,6 +208,19 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
                   className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none focus:border-neutral-900 transition-colors resize-none placeholder:text-neutral-400"
                 />
               </Field>
+              <div className="pt-1">
+                <ImageDropzone
+                  label="Product Images"
+                  value={imageUrls}
+                  onChange={(urls) => {
+                    setImageUrls(urls);
+                    setHeroUrl((prev) => (urls.includes(prev) ? prev : urls[0] ?? ''));
+                  }}
+                  heroUrl={heroUrl}
+                  onHeroChange={setHeroUrl}
+                  maxImages={8}
+                />
+              </div>
             </Card>
           )}
 

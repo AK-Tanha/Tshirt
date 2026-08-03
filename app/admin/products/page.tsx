@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useProducts, useDeleteProduct } from "@/hooks/use-products";
 import { useSuppliers } from "@/hooks/use-suppliers";
 import type { Product } from "@/lib/types";
+import { getHeroImage } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
@@ -147,9 +148,9 @@ export default function AdminProducts() {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-neutral-100 overflow-hidden shrink-0">
-                          {product.images[0] && (
+                          {getHeroImage(product.images) && (
                             <Image
-                              src={product.images[0].url}
+                              src={getHeroImage(product.images)!.url}
                               alt={product.name}
                               width={40}
                               height={40}

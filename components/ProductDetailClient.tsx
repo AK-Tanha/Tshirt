@@ -1,8 +1,6 @@
 "use client";
 import { useState } from "react";
 import { Product } from "@/lib/types";
-import { useCart } from "@/context/CartContext";
-import { MotionSection } from "./MotionSection";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -13,171 +11,247 @@ import {
   Minus,
   Plus,
   ChevronLeft,
+  Check,
 } from "lucide-react";
 import { useAddToCart } from '@/hooks/use-cart';
+import { orderImages } from '@/lib/utils';
 
 export const ProductDetailClient = ({ product }: { product: Product }) => {
-  const [selectedSize, setSelectedSize] = useState<string>("M");
+  const galleryImages = orderImages(product.images);
+  const [selectedSize, setSelectedSize] = useState<string>(
+    product.variants[0]?.size ?? "M",
+  );
+  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const { dispatch } = useCart();
   const addToCart = useAddToCart();
-  
-  const handleAddToCart = () => {
-  const selectedVariant = product.variants.find((v) => v.size === selectedSize);
-  if (!selectedVariant) return;
+  const [justAdded, setJustAdded] = useState(false);
 
-  addToCart.mutate({
-    productId: product.id,
-    variantId: selectedVariant.id,
-    quantity,
-  });
-};
+  const handleAddToCart = () => {
+    const selectedVariant = product.variants.find(
+      (v) => v.size === selectedSize,
+    );
+    if (!selectedVariant) return;
+
+    addToCart.mutate(
+      {
+        productId: product.id,
+        variantId: selectedVariant.id,
+        quantity,
+      },
+      {
+        onSuccess: () => {
+          setJustAdded(true);
+          setTimeout(() => setJustAdded(false), 1800);
+        },
+      },
+    );
+  };
+
+  const selectedVariant = product.variants.find((v) => v.size === selectedSize);
+  const price = selectedVariant?.price ?? product.basePrice;
 
   return (
-    <div className="grid lg:grid-cols-12 gap-6 md:gap-12">
-      <MotionSection className="lg:col-span-7">
-        <div className="relative aspect-[4/5] bg-stone rounded-2xl overflow-hidden group">
+    <div className="grid lg:grid-cols-12 gap-8 md:gap-12">
+      {/* Gallery */}
+      <div className="lg:col-span-7">
+        <Link
+          href="/products"
+          className="lg:hidden font-mono text-[10px] text-muted uppercase tracking-[0.2em] hover:text-ink transition-colors flex items-center gap-1.5 mb-4"
+        >
+          <ChevronLeft className="w-3 h-3" /> Back to shop
+        </Link>
+        <div className="relative aspect-[4/5] bg-stone rounded-2xl md:rounded-3xl overflow-hidden">
           <Image
-            src={product.images[0].url}
+            src={galleryImages[selectedImage]?.url ?? "/placeholder.png"}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            sizes="(max-width: 1024px) 100vw, 60vw"
+            className="object-cover"
             referrerPolicy="no-referrer"
             priority
           />
-          <div className="absolute top-4 left-4">
-            <span className="bg-white/90 backdrop-blur-sm text-black font-mono text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-full">
-              Limited
+          {product.category?.name && (
+            <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-ink font-mono text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full">
+              {product.category.name}
             </span>
-          </div>
+          )}
         </div>
-        {product.images.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-4">
-            {product.images.map((img, i) => (
-              <div
+        {galleryImages.length > 1 && (
+          <div className="no-scrollbar flex gap-3 mt-3 overflow-x-auto md:grid md:grid-cols-3 lg:grid-cols-4">
+            {galleryImages.map((img, i) => (
+              <button
                 key={i}
-                className="relative aspect-square bg-stone rounded-xl overflow-hidden"
+                onClick={() => setSelectedImage(i)}
+                className={`relative aspect-square bg-stone rounded-xl overflow-hidden shrink-0 w-20 md:w-full transition-all ${
+                  selectedImage === i
+                    ? "ring-2 ring-ink ring-offset-2 ring-offset-bg-primary"
+                    : "opacity-70 hover:opacity-100"
+                }`}
               >
                 <Image
                   src={img.url}
                   alt={`${product.name} ${i + 1}`}
                   fill
-                  className="object-cover hover:scale-105 transition-transform duration-700 ease-out"
+                  sizes="80px"
+                  className="object-cover"
                 />
-              </div>
+              </button>
             ))}
           </div>
         )}
-      </MotionSection>
+      </div>
 
-      <MotionSection className="lg:col-span-5">
-        <div className="sticky top-28">
+      {/* Info */}
+      <div className="lg:col-span-5">
+        <div className="lg:sticky lg:top-24">
           <Link
             href="/products"
-            className="font-mono text-[10px] text-muted uppercase tracking-widest hover:text-black transition-colors flex items-center gap-1.5 mb-6"
+            className="hidden lg:inline font-mono text-[10px] text-muted uppercase tracking-[0.2em] hover:text-ink transition-colors flex items-center gap-1.5 mb-5"
           >
             <ChevronLeft className="w-3 h-3" /> Shop /{" "}
-            <span className="text-black">{product.category.name}</span>
+            <span className="text-ink">{product.category.name}</span>
           </Link>
 
-          <h1 className="font-display text-4xl md:text-6xl text-black tracking-tight leading-[0.9] font-bold">
+          <h1 className="font-display text-3xl md:text-5xl text-ink tracking-tight leading-[1.05] font-bold">
             {product.name}
           </h1>
-          <p className="text-2xl md:text-3xl font-display text-black mt-3 font-bold">
-            ৳{product.basePrice}
+          <p className="text-2xl md:text-3xl font-display text-ink mt-3 font-semibold">
+            ৳{Number(price).toLocaleString()}
+          </p>
+          <p className="font-mono text-[10px] text-muted uppercase tracking-[0.2em] mt-1">
+            Cash on delivery available
           </p>
 
-          <p className="text-muted font-body text-sm leading-relaxed mt-6">
-            {product.description}
-          </p>
+          {product.description && (
+            <p className="text-muted font-body text-sm leading-relaxed mt-6">
+              {product.description}
+            </p>
+          )}
 
+          {/* Size selector */}
           <div className="mt-8">
-            <span className="font-mono text-[10px] text-muted uppercase tracking-widest block mb-3">
-              Select Size
-            </span>
-            <div className="flex gap-2">
-              {product.variants.map((variant) => (
-                <button
-                  key={variant.size}
-                  onClick={() => setSelectedSize(variant.size)}
-                  className={`px-4 h-10 rounded-lg font-mono text-[10px] font-medium transition-all ${
-                    selectedSize === variant.size
-                      ? "bg-black text-white shadow-md"
-                      : "bg-white text-black border border-border hover:border-black"
-                  }`}
-                >
-                  {variant.size}
-                </button>
-              ))}
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-[10px] text-muted uppercase tracking-[0.2em]">
+                Select size
+              </span>
+              <span className="font-mono text-[10px] text-ink/50 uppercase tracking-[0.2em]">
+                {selectedVariant
+                  ? `${selectedVariant.stock} in stock`
+                  : "Sold out"}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {product.variants.map((variant) => {
+                const active = selectedSize === variant.size;
+                const soldOut = variant.stock <= 0;
+                return (
+                  <button
+                    key={variant.size}
+                    onClick={() => setSelectedSize(variant.size)}
+                    disabled={soldOut}
+                    className={`relative min-w-[52px] h-12 rounded-xl font-mono text-xs font-medium transition-all ${
+                      active
+                        ? "bg-ink text-white shadow-lg shadow-ink/10"
+                        : soldOut
+                          ? "bg-stone text-muted/50 line-through cursor-not-allowed"
+                          : "bg-white text-ink border border-border hover:border-ink"
+                    }`}
+                  >
+                    {variant.size}
+                    {active && (
+                      <Check className="w-3 h-3 absolute -top-1.5 -right-1.5 bg-ink text-white rounded-full p-0.5" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
+          {/* Qty */}
           <div className="mt-6 flex items-center gap-4">
-            <span className="font-mono text-[10px] text-muted uppercase tracking-widest">
+            <span className="font-mono text-[10px] text-muted uppercase tracking-[0.2em]">
               Qty
             </span>
-            <div className="flex items-center border border-border rounded-lg overflow-hidden">
+            <div className="flex items-center border border-border rounded-xl overflow-hidden bg-white">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="p-2.5 hover:bg-stone transition-colors"
+                className="p-3 hover:bg-stone transition-colors"
+                aria-label="Decrease quantity"
               >
-                <Minus className="w-3 h-3" />
+                <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="w-10 text-center font-mono text-xs">
+              <span className="w-10 text-center font-mono text-sm">
                 {quantity}
               </span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="p-2.5 hover:bg-stone transition-colors"
+                className="p-3 hover:bg-stone transition-colors"
+                aria-label="Increase quantity"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
+          {/* CTAs */}
           <div className="flex flex-col gap-3 mt-8">
             <button
               onClick={handleAddToCart}
-              className="w-full bg-black text-white py-4 rounded-xl font-body font-medium text-sm tracking-wider hover:bg-black/90 transition-all duration-500 flex items-center justify-center gap-2 shadow-lg shadow-black/10"
+              className={`w-full py-4 rounded-full font-body font-semibold text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-2 ${
+                justAdded
+                  ? "bg-emerald-600 text-white"
+                  : "bg-ink text-white hover:bg-ink/90 shadow-lg shadow-ink/10"
+              }`}
             >
-              <ShoppingBag className="w-4 h-4" />
-              Add to Bag
+              {justAdded ? (
+                <>
+                  <Check className="w-4 h-4" /> Added to bag
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" /> Add to Bag · ৳
+                  {(
+                    Number(price) * quantity
+                  ).toLocaleString()}
+                </>
+              )}
             </button>
             <a
-              href={`https://m.me/yourbrand?text=I want to order: ${product.name} – Size ${selectedSize} – ৳${product.basePrice}`}
-              className="w-full border border-border text-black py-4 rounded-xl font-body text-sm font-medium text-center hover:bg-stone transition-all flex items-center justify-center gap-2"
+              href={`https://m.me/yourbrand?text=I want to order: ${product.name} – Size ${selectedSize} – ৳${price}`}
+              className="w-full border border-border text-ink py-4 rounded-full font-body text-sm font-medium text-center hover:bg-stone transition-all flex items-center justify-center gap-2"
             >
               <MessageCircle className="w-4 h-4" />
               Order via Messenger
             </a>
           </div>
 
+          {/* Perks */}
           <div className="mt-10 pt-8 border-t border-border grid grid-cols-2 gap-6">
             <div className="flex items-start gap-3">
-              <Truck className="w-4 h-4 text-black/40 mt-0.5 shrink-0" />
+              <Truck className="w-4 h-4 text-ink/40 mt-0.5 shrink-0" />
               <div>
-                <span className="font-mono text-[10px] text-black uppercase tracking-widest block mb-1">
+                <span className="font-mono text-[10px] text-ink uppercase tracking-[0.2em] block mb-1">
                   Shipping
                 </span>
-                <span className="font-mono text-[9px] text-muted uppercase tracking-widest">
-                  Worldwide Delivery
+                <span className="font-mono text-[9px] text-muted uppercase tracking-[0.2em]">
+                  Free in Dhaka · 2–4 days
                 </span>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <RotateCcw className="w-4 h-4 text-black/40 mt-0.5 shrink-0" />
+              <RotateCcw className="w-4 h-4 text-ink/40 mt-0.5 shrink-0" />
               <div>
-                <span className="font-mono text-[10px] text-black uppercase tracking-widest block mb-1">
+                <span className="font-mono text-[10px] text-ink uppercase tracking-[0.2em] block mb-1">
                   Returns
                 </span>
-                <span className="font-mono text-[9px] text-muted uppercase tracking-widest">
-                  7-Day Exchange
+                <span className="font-mono text-[9px] text-muted uppercase tracking-[0.2em]">
+                  7-day exchange
                 </span>
               </div>
             </div>
           </div>
         </div>
-      </MotionSection>
+      </div>
     </div>
   );
 };

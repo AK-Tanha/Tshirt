@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, getHeroImage } from "@/lib/utils";
 import { useProduct } from "@/hooks/use-products";
 import { useSuppliers } from "@/hooks/use-suppliers";
 import { Badge } from "@/components/ui/Badge";
@@ -52,7 +52,8 @@ export default function ProductDetailPage() {
 
   const stock = getStockInfo(product.variants);
   const supplier = suppliers.find((s) => s.id === product.supplierId);
-  const currentImage = selectedImage || product.images[0]?.url || "";
+  const hero = getHeroImage(product.images);
+  const currentImage = selectedImage || hero?.url || "";
 
   return (
     <div className="space-y-6">
@@ -117,6 +118,11 @@ export default function ProductDetailPage() {
                         )}
                       >
                         <Image src={img.url} alt="" fill className="object-cover" />
+                        {img.isHero && (
+                          <span className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[7px] font-mono uppercase tracking-wider text-center py-0.5">
+                            Hero
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>

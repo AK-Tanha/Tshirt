@@ -6,12 +6,12 @@ interface MarqueeProps {
 
 export const Marquee: React.FC<MarqueeProps> = ({ text }) => {
  return (
- <div className="overflow-hidden whitespace-nowrap py-5 border-y border-border bg-stone">
- <div className="inline-block animate-marquee">
+ <div className="overflow-hidden whitespace-nowrap py-6 md:py-8 border-y border-border bg-cream">
+ <div className="inline-block animate-marquee will-change-transform">
  {[...Array(10)].map((_, i) => (
- <span key={i} className="font-display text-3xl md:text-5xl mx-8 text-black/20 font-bold tracking-tight">
- {text}
- </span>
+  <span key={i} className="font-display text-2xl md:text-4xl mx-8 text-ink/20 font-semibold tracking-tight">
+  {text}
+  </span>
  ))}
  </div>
  </div>

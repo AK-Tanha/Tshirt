@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { StickyAddToCart } from '@/components/StickyAddToCart';
 import { ProductDetailClient } from '@/components/ProductDetailClient';
 import { getProduct } from '@/lib/api/products';
+import { getHeroImage } from '@/lib/utils';
 import { ApiError } from '@/lib/api-client';
 
 async function fetchProductSafe(id: string) {
@@ -22,6 +23,7 @@ export async function generateMetadata({
   const { id } = await params;
   const product = await fetchProductSafe(id);
   if (!product) return {};
+  const hero = getHeroImage(product.images);
 
   return {
     title: product.name,
@@ -29,7 +31,7 @@ export async function generateMetadata({
     openGraph: {
       title: product.name,
       description: product.description || "",
-      images: product.images[0] ? [product.images[0].url] : [],
+      images: hero ? [hero.url] : [],
     },
   };
 }
@@ -44,7 +46,7 @@ export default async function ProductDetail({
   if (!product) notFound();
 
   return (
-    <main className="max-w-7xl mx-auto px-4 md:px-12 pb-24 md:pb-32">
+    <main className="px-page max-w-7xl mx-auto pb-28 md:pb-32">
       <ProductDetailClient product={product} />
       <StickyAddToCart product={product} />
     </main>

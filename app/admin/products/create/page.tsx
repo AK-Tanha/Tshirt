@@ -7,6 +7,7 @@ import { useCreateProduct } from '@/hooks/use-products';
 import { useSuppliers } from '@/hooks/use-suppliers';
 import { useCategories } from '@/hooks/use-categories';
 import { Field, getInputClass } from '@/components/ui/Field';
+import { ImageDropzone } from '@/components/ImageDropzone';
 import { Loader2, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 
 interface VariantForm {
@@ -28,7 +29,8 @@ export default function CreateProductPage() {
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [supplierId, setSupplierId] = useState('');
-  const [imageUrls, setImageUrls] = useState('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [heroUrl, setHeroUrl] = useState<string>('');
   const [variants, setVariants] = useState<VariantForm[]>([
     { size: 'M', color: '', stock: '0', price: '' },
   ]);
@@ -66,7 +68,8 @@ export default function CreateProductPage() {
         description,
         categoryId,
         supplierId: supplierId || undefined,
-        imageUrls: imageUrls.split(',').map((u) => u.trim()).filter(Boolean),
+        imageUrls: imageUrls,
+        ...(heroUrl && { heroImageUrl: heroUrl }),
         variants: variants
           .filter((v) => v.color.trim())
           .map((v) => ({
@@ -155,15 +158,17 @@ export default function CreateProductPage() {
             </select>
           </Field>
 
-          <Field label="Image URLs">
-            <input
-              type="text"
-              value={imageUrls}
-              onChange={(e) => setImageUrls(e.target.value)}
-              placeholder="https://... (comma separated)"
-              className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none transition-all duration-200 focus:border-black focus:ring-1 focus:ring-black/10 placeholder:text-muted/60"
-            />
-          </Field>
+          <ImageDropzone
+            label="Product Images"
+            value={imageUrls}
+            onChange={(urls) => {
+              setImageUrls(urls);
+              setHeroUrl((prev) => (urls.includes(prev) ? prev : urls[0] ?? ''));
+            }}
+            heroUrl={heroUrl}
+            onHeroChange={setHeroUrl}
+            maxImages={8}
+          />
 
           <div>
             <div className="flex items-center justify-between mb-2">
