@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import {
   motion,
@@ -12,6 +11,7 @@ import { ShoppingBag, X, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useCategories } from "@/hooks/use-categories";
 import { useAuthStore } from "@/stores/auth-store";
+import { Logo } from "@/components/Logo";
 
 export const Navbar = () => {
   const { state } = useCart();
@@ -63,14 +63,9 @@ export const Navbar = () => {
         <Link
           href="/"
           onClick={() => setMobileOpen(false)}
-          className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-baseline gap-2"
+          className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center"
         >
-          <span className="font-display text-2xl md:text-[1.7rem] tracking-tight text-ink leading-none font-bold">
-            Apan
-          </span>
-          <span className="hidden sm:inline font-mono text-[9px] tracking-[0.35em] uppercase text-ink/50">
-            Apparel
-          </span>
+          <Logo priority className="h-8 md:h-9 w-auto" />
         </Link>
 
         {/* Desktop links */}

@@ -62,6 +62,61 @@ export interface Category {
 }
 
 // ----------------------------------------------------------------------------
+// Brands
+// ----------------------------------------------------------------------------
+
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  _count?: {
+    products: number;
+  };
+}
+
+export interface CreateBrandPayload {
+  name: string;
+  slug: string;
+}
+
+// ----------------------------------------------------------------------------
+// Collections
+// ----------------------------------------------------------------------------
+
+export interface Collection {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  image: string | null;
+  isActive: boolean;
+  createdAt: string;
+  _count?: {
+    products: number;
+  };
+  products?: CollectionProduct[];
+}
+
+export interface CollectionProduct {
+  id: string;
+  name: string;
+  description: string | null;
+  basePrice: string;
+  isActive: boolean;
+  category?: { name: string } | null;
+  images: { url: string; isHero?: boolean }[];
+}
+
+export interface CreateCollectionPayload {
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string;
+  isActive?: boolean;
+  productIds?: string[];
+}
+
+// ----------------------------------------------------------------------------
 // Products
 // ----------------------------------------------------------------------------
 
@@ -94,6 +149,9 @@ export interface Product {
   createdAt: string;
   categoryId: string;
   category: Category;
+  brandId: string | null;
+  brand?: Brand | null;
+  collections?: Collection[];
   images: ProductImage[];
   variants: ProductVariant[];
 }
@@ -111,6 +169,7 @@ export interface PaginatedProducts {
 export interface ProductQueryParams {
   search?: string;
   categoryId?: string;
+  collectionId?: string;
   size?: string;
   color?: string;
   minPrice?: number;
@@ -126,6 +185,8 @@ export interface CreateProductPayload {
   lotNumber?: string;
   categoryId: string;
   supplierId?: string;
+  brandId?: string;
+  collectionIds?: string[];
   imageUrls?: string[];
   heroImageUrl?: string;
   variants: {

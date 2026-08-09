@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLogin } from '@/hooks/use-auth';
+import { Logo } from '@/components/Logo';
 
 export default function LoginPage() {
   const [phone, setPhone] = useState('');
@@ -26,12 +27,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-surface px-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="group flex flex-col items-center mb-10">
-          <span className="font-display text-4xl tracking-[0.15em] text-black font-bold leading-none group-hover:scale-105 transition-transform duration-300">
-            APAN
-          </span>
-          <span className="text-[10px] tracking-[0.3em] uppercase text-black/60 -mt-1">
-            Fashion
-          </span>
+          <Logo
+            alt="APAN"
+            priority
+            className="h-14 w-auto group-hover:scale-105 transition-transform duration-300"
+          />
         </Link>
 
         <div className="bg-white border border-border rounded-2xl p-8 shadow-sm animate-fade-in">

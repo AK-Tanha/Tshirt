@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Logo } from '@/components/Logo';
 
 export const Footer = () => {
  return (
@@ -9,9 +10,9 @@ export const Footer = () => {
  <div className="col-span-2 md:col-span-5">
  <Link
   href="/"
-  className="font-display text-3xl md:text-4xl tracking-tight font-bold block mb-4"
+  className="block mb-4"
  >
-  Apan
+  <Logo variant="white" alt="Apan" className="h-10 md:h-12 w-auto" />
  </Link>
  <p className="font-body text-sm text-white/50 max-w-sm leading-relaxed">
   Crafting the future of apparel through high-quality materials and timeless

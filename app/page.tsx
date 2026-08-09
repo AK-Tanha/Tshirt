@@ -6,6 +6,7 @@ import { MotionSection } from "@/components/MotionSection";
 import { Marquee } from "@/components/Marquee";
 import { motion } from "motion/react";
 import { useCategories } from "../hooks/use-categories";
+import { useCollections } from "../hooks/use-collections";
 import { Truck, RotateCcw, ShieldCheck, ArrowRight } from "lucide-react";
 
 const perks = [
@@ -18,6 +19,9 @@ export default function Home() {
   const { data, isLoading, error } = useProducts({ page: 1, limit: 20 });
   const products = data?.data ?? [];
   const { data: categories } = useCategories();
+  const { data: collections } = useCollections();
+
+  const activeCollections = (collections ?? []).filter((c) => c.isActive);
 
   const featured = products.slice(0, 4);
 
@@ -177,6 +181,100 @@ export default function Home() {
                 </motion.div>
               ))}
             </div>
+          </section>
+        );
+      })}
+
+      {/* Collection sections (lifterx-style: heading + banner + product cards row) */}
+      {activeCollections.map((collection) => {
+        const collectionProducts = (collection.products ?? []).filter(
+          (p) => p.isActive,
+        );
+        return (
+          <section
+            key={collection.id}
+            className="px-page max-w-7xl mx-auto pt-14 md:pt-24"
+          >
+            <div className="flex justify-between items-end mb-8 md:mb-10">
+              <MotionSection>
+                <span className="font-mono text-muted uppercase tracking-[0.35em] text-[10px] mb-3 block">
+                  Collection
+                </span>
+                <h2 className="font-display text-4xl md:text-6xl text-ink tracking-tight font-bold leading-none">
+                  {collection.name}
+                </h2>
+              </MotionSection>
+              <Link
+                href={`/products?collection=${collection.slug}`}
+                className="font-body text-[13px] text-muted hover:text-ink transition-colors flex items-center gap-1.5 shrink-0"
+              >
+                Shop collection <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+            >
+              <Link
+                href={`/products?collection=${collection.slug}`}
+                className="group relative block aspect-[16/9] md:aspect-[21/9] w-full overflow-hidden rounded-2xl bg-stone"
+              >
+                {collection.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={collection.image}
+                    alt={collection.name}
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="font-display text-5xl md:text-7xl text-ink/10 tracking-tight">
+                      {collection.name}
+                    </span>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-r from-ink/80 via-ink/35 to-transparent" />
+                <div className="absolute left-6 md:left-10 bottom-6 md:bottom-10 text-white max-w-lg">
+                  <p className="font-mono text-white/60 uppercase tracking-[0.35em] text-[10px] mb-3 block">
+                    Featured collection
+                  </p>
+                  <h3 className="font-display text-3xl md:text-5xl text-white tracking-tight font-bold leading-none">
+                    {collection.name}
+                  </h3>
+                  {collection.description && (
+                    <p className="font-body text-sm md:text-base text-white/75 mt-3 leading-relaxed line-clamp-2">
+                      {collection.description}
+                    </p>
+                  )}
+                  <span className="inline-flex items-center gap-2 font-body text-sm font-semibold text-white mt-5 group-hover:gap-3 transition-all">
+                    Shop now <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
+
+            {collectionProducts.length > 0 && (
+              <div className="mt-8 md:mt-10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex gap-4 md:gap-6 min-w-max">
+                  {collectionProducts.map((product, idx) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-60px" }}
+                      transition={{ delay: idx * 0.06, duration: 0.5 }}
+                      className="w-[45vw] sm:w-[260px] shrink-0 snap-start"
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         );
       })}

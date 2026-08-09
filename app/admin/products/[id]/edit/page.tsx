@@ -7,12 +7,14 @@ import { cn } from '@/lib/utils';
 import { useProduct, useUpdateProduct } from '@/hooks/use-products';
 import { useSuppliers } from '@/hooks/use-suppliers';
 import { useCategories } from '@/hooks/use-categories';
+import { useBrands } from '@/hooks/use-brands';
+import { useCollections } from '@/hooks/use-collections';
 import { Field, getInputClass } from '@/components/ui/Field';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardTitle } from '@/components/ui/Card';
 import { ImageDropzone } from '@/components/ImageDropzone';
 import { useToast } from '@/components/ui/Toast';
-import type { Product, Supplier, Category } from '@/lib/types';
+import type { Product, Supplier, Category, Brand, Collection } from '@/lib/types';
 import {
   ArrowLeft, Save, Package, Settings,
   LayoutGrid, Loader2, AlertCircle, Check, Eye,
@@ -32,6 +34,8 @@ export default function ProductEditPage() {
   const { data: product, isLoading } = useProduct(params.id);
   const { data: suppliers = [] } = useSuppliers();
   const { data: categories = [] } = useCategories();
+  const { data: brands = [] } = useBrands();
+  const { data: collections = [] } = useCollections();
 
   if (isLoading) {
     return (
@@ -55,15 +59,19 @@ export default function ProductEditPage() {
       product={product}
       suppliers={suppliers}
       categories={categories}
+      brands={brands}
+      collections={collections}
       onCancel={() => router.back()}
     />
   );
 }
 
-function ProductForm({ product, suppliers, categories, onCancel }: {
+function ProductForm({ product, suppliers, categories, brands, collections, onCancel }: {
   product: Product;
   suppliers: Supplier[];
   categories: Category[];
+  brands: Brand[];
+  collections: Collection[];
   onCancel: () => void;
 }) {
   const router = useRouter();
@@ -76,6 +84,10 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
   const [description, setDescription] = useState(product.description ?? '');
   const [categoryId, setCategoryId] = useState(product.categoryId ?? '');
   const [supplierId, setSupplierId] = useState(product.supplierId ?? '');
+  const [brandId, setBrandId] = useState(product.brandId ?? '');
+  const [collectionIds, setCollectionIds] = useState<string[]>(
+    product.collections?.map((c) => c.id) ?? [],
+  );
   const [variants, setVariants] = useState(product.variants);
   const [imageUrls, setImageUrls] = useState<string[]>(
     product.images?.map((i) => i.url) ?? [],
@@ -105,6 +117,8 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
           description,
           categoryId,
           supplierId: supplierId || undefined,
+          brandId: brandId || undefined,
+          collectionIds,
           imageUrls,
           ...(heroUrl && { heroImageUrl: heroUrl }),
         },
@@ -198,6 +212,47 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
+              </Field>
+              <Field label="Brand">
+                <select
+                  value={brandId}
+                  onChange={(e) => setBrandId(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none focus:border-neutral-900 transition-colors"
+                >
+                  <option value="">No brand</option>
+                  {brands.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Collections">
+                <div className="max-h-40 overflow-y-auto border border-border rounded-lg divide-y divide-border/50">
+                  {collections.length === 0 && (
+                    <p className="px-3 py-2.5 text-sm text-neutral-400">
+                      No collections yet
+                    </p>
+                  )}
+                  {collections.map((c) => (
+                    <label
+                      key={c.id}
+                      className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-neutral-50 transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={collectionIds.includes(c.id)}
+                        onChange={() =>
+                          setCollectionIds((prev) =>
+                            prev.includes(c.id)
+                              ? prev.filter((id) => id !== c.id)
+                              : [...prev, c.id],
+                          )
+                        }
+                        className="w-4 h-4 rounded border-border accent-black"
+                      />
+                      <span className="text-sm">{c.name}</span>
+                    </label>
+                  ))}
+                </div>
               </Field>
               <Field label="Description">
                 <textarea
@@ -302,6 +357,16 @@ function ProductForm({ product, suppliers, categories, onCancel }: {
                 <span className="font-medium">
                   {categories.find((c) => c.id === categoryId)?.name ?? '—'}
                 </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-500">Brand</span>
+                <span className="font-medium">
+                  {brands.find((b) => b.id === brandId)?.name ?? '—'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-500">Collections</span>
+                <span className="font-medium">{collectionIds.length}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-neutral-500">Variants</span>

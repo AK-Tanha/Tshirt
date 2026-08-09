@@ -1,11 +1,18 @@
-import { Product } from "@/lib/types";
 import { getHeroImage } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
 
+export interface ProductCardData {
+  id: string;
+  name: string;
+  basePrice: string;
+  category?: { name: string } | null;
+  images: { url: string; isHero?: boolean }[];
+}
+
 interface ProductCardProps {
-  product: Product;
+  product: ProductCardData;
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {

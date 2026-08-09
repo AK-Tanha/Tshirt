@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { useProducts } from "@/hooks/use-products";
 import { useCategories } from "@/hooks/use-categories";
+import { useCollections } from "@/hooks/use-collections";
 import { ProductCard } from "@/components/ProductCard";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -14,15 +15,20 @@ type SortKey = "featured" | "price-asc" | "price-desc" | "newest";
 function ProductContent() {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get("category");
+  const collectionSlug = searchParams.get("collection");
   const [sort, setSort] = useState<SortKey>("featured");
   const [sortOpen, setSortOpen] = useState(false);
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: collections, isLoading: collectionsLoading } =
+    useCollections();
 
   const activeCategory = categories?.find((c) => c.slug === categorySlug);
+  const activeCollection = collections?.find((c) => c.slug === collectionSlug);
 
   const { data: products, isLoading: productsLoading } = useProducts({
-    categoryId: activeCategory?.id,
+    categoryId: activeCollection ? undefined : activeCategory?.id,
+    collectionId: activeCollection?.id,
     limit: 50,
   });
 
@@ -47,7 +53,9 @@ function ProductContent() {
     }
   }, [products, sort]);
 
-  if (categoriesLoading || productsLoading)
+  const activeCollections = (collections ?? []).filter((c) => c.isActive);
+
+  if (categoriesLoading || collectionsLoading || productsLoading)
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <p className="font-body text-muted animate-pulse">Loading...</p>
@@ -69,17 +77,26 @@ function ProductContent() {
           Collection 2026
         </span>
         <h1 className="font-display text-5xl md:text-7xl text-ink tracking-tight leading-none font-bold">
-          {activeCategory ? activeCategory.name : "All Products"}
+          {activeCollection
+            ? activeCollection.name
+            : activeCategory
+              ? activeCategory.name
+              : "All Products"}
         </h1>
+        {activeCollection?.description && (
+          <p className="font-body text-muted text-sm md:text-base mt-4 max-w-lg leading-relaxed">
+            {activeCollection.description}
+          </p>
+        )}
       </MotionSection>
 
-      {/* Category chips — horizontal scroll on mobile */}
+      {/* Filter chips — categories + collections */}
       <div className="no-scrollbar -mx-5 px-page overflow-x-auto md:mx-0 md:px-0">
-        <div className="flex gap-2 md:flex-wrap md:gap-3 pb-1 md:pb-0 md:border-b md:border-border">
+        <div className="flex items-center gap-2 md:flex-wrap md:gap-3 pb-1 md:pb-0 md:border-b md:border-border">
           <Link
             href="/products"
             className={`shrink-0 rounded-full border px-4 py-2 font-body text-[13px] font-medium transition-colors ${
-              !categorySlug
+              !categorySlug && !collectionSlug
                 ? "bg-ink text-white border-ink"
                 : "border-border text-ink/70 hover:border-ink"
             }`}
@@ -99,6 +116,27 @@ function ProductContent() {
               {cat.name}
             </Link>
           ))}
+          {activeCollections.length > 0 && (
+            <>
+              <span className="hidden md:block w-px h-5 bg-border mx-1 shrink-0" />
+              <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.25em] text-muted pl-1">
+                Collections
+              </span>
+              {activeCollections.map((col) => (
+                <Link
+                  key={col.id}
+                  href={`/products?collection=${col.slug}`}
+                  className={`shrink-0 rounded-full border px-4 py-2 font-body text-[13px] font-medium transition-colors ${
+                    collectionSlug === col.slug
+                      ? "bg-tan text-ink border-tan"
+                      : "border-border text-ink/70 hover:border-ink"
+                  }`}
+                >
+                  {col.name}
+                </Link>
+              ))}
+            </>
+          )}
         </div>
       </div>
 

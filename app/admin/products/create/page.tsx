@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { useCreateProduct } from '@/hooks/use-products';
 import { useSuppliers } from '@/hooks/use-suppliers';
 import { useCategories } from '@/hooks/use-categories';
+import { useBrands } from '@/hooks/use-brands';
+import { useCollections } from '@/hooks/use-collections';
 import { Field, getInputClass } from '@/components/ui/Field';
 import { ImageDropzone } from '@/components/ImageDropzone';
 import { Loader2, ArrowLeft, Plus, Trash2 } from 'lucide-react';
@@ -24,11 +26,15 @@ export default function CreateProductPage() {
   const createProduct = useCreateProduct();
   const { data: suppliers = [] } = useSuppliers();
   const { data: categories = [] } = useCategories();
+  const { data: brands = [] } = useBrands();
+  const { data: collections = [] } = useCollections();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [supplierId, setSupplierId] = useState('');
+  const [brandId, setBrandId] = useState('');
+  const [collectionIds, setCollectionIds] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [heroUrl, setHeroUrl] = useState<string>('');
   const [variants, setVariants] = useState<VariantForm[]>([
@@ -68,6 +74,8 @@ export default function CreateProductPage() {
         description,
         categoryId,
         supplierId: supplierId || undefined,
+        brandId: brandId || undefined,
+        collectionIds,
         imageUrls: imageUrls,
         ...(heroUrl && { heroImageUrl: heroUrl }),
         variants: variants
@@ -156,6 +164,49 @@ export default function CreateProductPage() {
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
+          </Field>
+
+          <Field label="Brand">
+            <select
+              value={brandId}
+              onChange={(e) => setBrandId(e.target.value)}
+              className="w-full px-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none transition-all duration-200 focus:border-black focus:ring-1 focus:ring-black/10"
+            >
+              <option value="">Select a brand...</option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Collections">
+            <div className="max-h-40 overflow-y-auto border border-border rounded-lg divide-y divide-border/50">
+              {collections.length === 0 && (
+                <p className="px-3 py-2.5 text-sm text-neutral-400">
+                  No collections yet
+                </p>
+              )}
+              {collections.map((c) => (
+                <label
+                  key={c.id}
+                  className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-stone transition-colors"
+                >
+                  <input
+                    type="checkbox"
+                    checked={collectionIds.includes(c.id)}
+                    onChange={() =>
+                      setCollectionIds((prev) =>
+                        prev.includes(c.id)
+                          ? prev.filter((id) => id !== c.id)
+                          : [...prev, c.id],
+                      )
+                    }
+                    className="w-4 h-4 rounded border-border accent-black"
+                  />
+                  <span className="text-sm">{c.name}</span>
+                </label>
+              ))}
+            </div>
           </Field>
 
           <ImageDropzone
