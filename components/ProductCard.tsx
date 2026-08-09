@@ -17,6 +17,8 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const hero = getHeroImage(product.images);
+  const hoverImage =
+    product.images.find((img) => img.url !== hero?.url) ?? null;
   return (
     <motion.div
       whileHover={{ y: -4 }}
@@ -32,9 +34,19 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            className="object-cover group-hover:scale-105 opacity-100 group-hover:opacity-0 transition-all duration-500 ease-out"
             referrerPolicy="no-referrer"
           />
+          {hoverImage && (
+            <Image
+              src={hoverImage.url}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, 25vw"
+              className="object-cover group-hover:scale-105 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out"
+              referrerPolicy="no-referrer"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-ink/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           {product.category?.name && (
             <span className="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-sm text-ink font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] px-2.5 py-1 rounded-full">
