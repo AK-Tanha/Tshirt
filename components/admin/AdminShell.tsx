@@ -30,10 +30,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   'fixed top-0 left-0 h-full w-64 z-50 lg:hidden transition-transform duration-300',
   mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full',
   )}>
- <Sidebar
- collapsed={false}
- onToggle={() => setMobileSidebarOpen(false)}
- />
+   <Sidebar
+  collapsed={false}
+  onToggle={() => setMobileSidebarOpen(false)}
+  onNavigate={() => setMobileSidebarOpen(false)}
+  />
  </div>
 
  <div className={cn(

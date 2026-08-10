@@ -108,18 +108,27 @@ export default function AdminInventory() {
         />
       </div>
 
-      <div className="relative">
+      <div className="relative min-w-0">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
         <input
           type="text"
           placeholder="Search by product name, size, color or supplier..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
+          className="w-full pl-9 pr-9 py-2.5 bg-white border border-border rounded-lg text-sm truncate outline-none focus:border-black transition-colors"
         />
+        {search && (
+          <button
+            onClick={() => setSearch('')}
+            aria-label="Clear search"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-neutral-400 hover:text-neutral-900 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      <Card className="p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -174,6 +183,63 @@ export default function AdminInventory() {
           </table>
         </div>
       </Card>
+
+      <div className="md:hidden space-y-3">
+        {isLoading && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            Loading inventory...
+          </div>
+        )}
+        {filtered.map((i) => (
+          <div
+            key={i.variantId}
+            className="bg-white rounded-xl border border-border p-4 space-y-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium truncate">{i.productName}</p>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  {i.size}
+                  {i.color && <span> · {i.color}</span>}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p
+                  className={cn(
+                    'font-mono text-sm font-medium',
+                    i.stock === 0
+                      ? 'text-red-600'
+                      : i.stock <= 5
+                        ? 'text-amber-600'
+                        : 'text-black',
+                  )}
+                >
+                  {i.stock}
+                </p>
+                <StockBadge qty={i.stock} />
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t border-border/50 pt-3">
+              <span className="text-xs text-neutral-500 truncate">
+                {i.supplierName ?? '—'}
+              </span>
+              {i.supplierName && (
+                <span
+                  className={cn(
+                    'w-1.5 h-1.5 rounded-full shrink-0',
+                    i.supplierActive ? 'bg-emerald-500' : 'bg-red-400',
+                  )}
+                />
+              )}
+            </div>
+          </div>
+        ))}
+        {!isLoading && filtered.length === 0 && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            No inventory items found
+          </div>
+        )}
+      </div>
 
       <p className="text-xs text-neutral-400">
         Stock levels are read from product variants. To adjust stock, edit a product&apos;s variants.

@@ -133,7 +133,7 @@ export default function AdminOrders() {
         </div>
       </Card>
 
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="bg-white rounded-xl border border-border overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -186,6 +186,58 @@ export default function AdminOrders() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {isLoading && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            Loading orders...
+          </div>
+        )}
+        {filtered.map((order) => (
+          <div key={order.id} className="bg-white rounded-xl border border-border p-4 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-mono text-xs text-neutral-500">#{order.id.slice(0, 8)}</p>
+                <p className="font-medium truncate mt-0.5">
+                  {order.user?.name ?? order.phone}
+                </p>
+              </div>
+              <Badge variant={statusBadge[order.status]} className="shrink-0">
+                {statusLabels[order.status]}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between border-t border-border/50 pt-3">
+              <div className="text-xs text-neutral-500 min-w-0">
+                {order.items.length} item{order.items.length > 1 ? 's' : ''} ·{' '}
+                <span className="font-mono font-medium text-neutral-900">
+                  ৳{Number(order.totalAmount).toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => handleViewInvoice(order)}
+                  aria-label="View invoice"
+                  className="p-2 rounded-lg text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                </button>
+                <Link
+                  href={`/admin/orders/${order.id}`}
+                  aria-label="View order"
+                  className="p-2 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                >
+                  <Eye className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+        {!isLoading && filtered.length === 0 && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            No orders found
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

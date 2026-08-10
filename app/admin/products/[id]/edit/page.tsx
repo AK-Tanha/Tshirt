@@ -138,19 +138,19 @@ function ProductForm({ product, suppliers, categories, brands, collections, onCa
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={onCancel} className="p-2 -ml-2 hover:bg-neutral-100 rounded-lg transition-colors">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 md:gap-4 min-w-0">
+          <button onClick={onCancel} className="p-2 -ml-2 shrink-0 hover:bg-neutral-100 rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
+          <div className="min-w-0">
+            <h1 className="font-display text-xl md:text-3xl font-bold tracking-tight truncate">
               Edit &ldquo;{product.name}&rdquo;
             </h1>
-            <p className="text-sm text-neutral-500 mt-1">Manage product details and variants</p>
+            <p className="text-sm text-neutral-500 mt-1 truncate">Manage product details and variants</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Link
             href={`/admin/products/${product.id}`}
             className="flex items-center gap-2 px-4 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-neutral-100 transition-colors"

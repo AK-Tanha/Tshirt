@@ -8,7 +8,11 @@ import { cn } from '@/lib/utils';
 import { navItems } from '@/lib/navigation';
 import { ChevronDown, LogOut, PanelLeftClose, PanelLeft, Store } from 'lucide-react';
 
-export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+export default function Sidebar({ collapsed, onToggle, onNavigate }: {
+  collapsed: boolean;
+  onToggle: () => void;
+  onNavigate?: () => void;
+}) {
  const pathname = usePathname();
  const [expanded, setExpanded] = useState<string[]>(['Catalog', 'Inventory', 'Orders']);
 
@@ -29,7 +33,7 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
  )}
  >
   <div className={cn('flex items-center h-16 px-4 border-b border-border', collapsed && 'justify-center')}>
-  <Link href="/admin" className={cn('flex items-center gap-2.5 min-w-0', collapsed && 'hidden')}>
+   <Link href="/admin" onClick={onNavigate} className={cn('flex items-center gap-2.5 min-w-0', collapsed && 'hidden')}>
   <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
   <Store className="w-4 h-4 text-white " />
   </div>
@@ -92,9 +96,10 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
  )}
  </button>
  ) : (
- <Link
- href={item.href!}
- className={cn(
+  <Link
+  href={item.href!}
+  onClick={onNavigate}
+  className={cn(
  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
  active
  ? 'bg-neutral-900 text-white '
@@ -120,10 +125,11 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
  >
  <div className="ml-1 pl-4 border-l border-border space-y-0.5 mt-0.5">
  {item.children!.map((child) => (
- <Link
- key={child.href}
- href={child.href}
- className={cn(
+  <Link
+  key={child.href}
+  href={child.href}
+  onClick={onNavigate}
+  className={cn(
  'block px-3 py-1.5 rounded-lg text-sm transition-colors',
  child === matchedChild
  ? 'text-neutral-900 font-medium bg-neutral-100 '
@@ -144,9 +150,10 @@ export default function Sidebar({ collapsed, onToggle }: { collapsed: boolean; o
  </nav>
 
   <div className="p-2 border-t border-border">
-  <Link
- href="/"
- className={cn(
+   <Link
+  href="/"
+  onClick={onNavigate}
+  className={cn(
  'flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-neutral-500 hover:bg-neutral-100 transition-colors',
  collapsed && 'justify-center',
  )}

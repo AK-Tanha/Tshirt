@@ -112,7 +112,7 @@ export default function AdminProducts() {
         </div>
       </Card>
 
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="bg-white rounded-xl border border-border overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -230,6 +230,91 @@ export default function AdminProducts() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {isLoading && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            Loading products...
+          </div>
+        )}
+        {filtered.map((product) => {
+          const stock = getStockInfo(product);
+          return (
+            <div
+              key={product.id}
+              className="bg-white rounded-xl border border-border p-4 space-y-3"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-12 h-12 rounded-lg bg-neutral-100 overflow-hidden shrink-0">
+                  {getHeroImage(product.images) && (
+                    <Image
+                      src={getHeroImage(product.images)!.url}
+                      alt={product.name}
+                      width={48}
+                      height={48}
+                      className="object-cover w-full h-full"
+                    />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/admin/products/${product.id}`}
+                    className="font-medium truncate block hover:text-neutral-600 transition-colors"
+                  >
+                    {product.name}
+                  </Link>
+                  <p className="text-xs text-neutral-500 truncate mt-0.5">
+                    {product.category?.name ?? "No category"}
+                  </p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-mono font-medium text-sm">
+                    ৳{Number(product.basePrice).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border-t border-border/50 pt-3">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Badge variant={product.isActive ? "success" : "neutral"}>
+                    {product.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                  <Badge variant={stock.variant}>
+                    {stock.label} ({stock.total})
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Link
+                    href={`/admin/products/${product.id}`}
+                    aria-label="View product"
+                    className="p-2 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href={`/admin/products/${product.id}/edit`}
+                    aria-label="Edit product"
+                    className="p-2 rounded-lg text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </Link>
+                  <button
+                    onClick={() => setDeletingProduct(product)}
+                    aria-label="Delete product"
+                    className="p-2 rounded-lg text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {!isLoading && filtered.length === 0 && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            No products found
+          </div>
+        )}
       </div>
 
       <ConfirmDialog

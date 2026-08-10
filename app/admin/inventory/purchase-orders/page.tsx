@@ -92,7 +92,7 @@ export default function AdminPurchaseOrders() {
         <StatCard title="In Transit" value={orders.filter((o) => o.status === 'ORDERED').length} subtitle="ordered from supplier" icon={ArrowRight} color="bg-blue-100 text-blue-600" />
       </div>
 
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="bg-white rounded-xl border border-border overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -171,6 +171,71 @@ export default function AdminPurchaseOrders() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="md:hidden space-y-3">
+        {isLoading && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            Loading purchase orders...
+          </div>
+        )}
+        {orders.map((po) => {
+          const meta = statusMeta[po.status];
+          const canAdvance = !!nextStatus[po.status];
+          return (
+            <div key={po.id} className="bg-white rounded-xl border border-border p-4 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-mono text-xs text-neutral-500">#{po.id.slice(0, 8)}</p>
+                  <p className="font-medium truncate mt-0.5">{po.supplier.name}</p>
+                </div>
+                <span className={cn('text-[11px] font-medium px-2.5 py-1 rounded-full shrink-0', meta.badge)}>
+                  {meta.label}
+                </span>
+              </div>
+              <div className="flex items-center justify-between border-t border-border/50 pt-3">
+                <div className="text-xs text-neutral-500">
+                  {po.items.length} item{po.items.length !== 1 ? 's' : ''} ·{' '}
+                  <span className="font-mono font-medium text-neutral-900">
+                    ৳{Number(po.totalCost).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {canAdvance && (
+                    <button
+                      onClick={() => handleAdvance(po)}
+                      disabled={updateStatus.isPending}
+                      className="px-3 py-1.5 bg-neutral-900 text-white text-[11px] font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                    >
+                      {po.status === 'ORDERED' ? 'Receive' : 'Mark Ordered'}
+                    </button>
+                  )}
+                  {po.status === 'PENDING' && (
+                    <button
+                      onClick={() => setCancelTarget(po)}
+                      className="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      aria-label="Cancel PO"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setSelected(po)}
+                    className="p-1.5 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                    aria-label="View PO"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {!isLoading && orders.length === 0 && (
+          <div className="bg-white rounded-xl border border-border p-12 text-center text-sm text-neutral-500">
+            No purchase orders yet.
+          </div>
+        )}
       </div>
 
       <AnimatePresence>
