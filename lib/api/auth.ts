@@ -1,5 +1,10 @@
 import { apiFetch } from '../api-client';
-import { AuthResponse, RegisterPayload, LoginPayload, User } from '@/lib/types';
+import {
+  AuthResponse,
+  RegisterPayload,
+  LoginPayload,
+  User,
+} from '@/lib/types';
 
 export function register(payload: RegisterPayload) {
   return apiFetch<AuthResponse>('/auth/register', {
@@ -17,4 +22,11 @@ export function login(payload: LoginPayload) {
 
 export function getMe() {
   return apiFetch<User>('/auth/me');
+}
+
+export function updateProfile(payload: Partial<Pick<User, 'name' | 'address' | 'image'>>) {
+  return apiFetch<User>('/auth/me', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 }

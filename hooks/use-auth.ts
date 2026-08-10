@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
-import { register, login } from '@/lib/api/auth';
+import { register, login, updateProfile } from '@/lib/api/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { getMe } from '@/lib/api/auth';
-import { RegisterPayload, LoginPayload } from '@/lib/types';
+import { RegisterPayload, LoginPayload, User } from '@/lib/types';
 
 export function useRegister() {
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -28,6 +28,19 @@ export function useLogin() {
       const user = await getMe();
       setAuth(user, data.access_token);
       return { user, access_token: data.access_token };
+    },
+  });
+}
+
+export function useUpdateProfile() {
+  const setAuth = useAuthStore((s) => s.setAuth);
+
+  return useMutation({
+    mutationFn: (payload: Partial<Pick<User, 'name' | 'address' | 'image'>>) =>
+      updateProfile(payload),
+    onSuccess: (user) => {
+      const token = localStorage.getItem('access_token');
+      if (token) setAuth(user, token);
     },
   });
 }

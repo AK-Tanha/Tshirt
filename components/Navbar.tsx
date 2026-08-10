@@ -7,11 +7,12 @@ import {
   useMotionValueEvent,
   AnimatePresence,
 } from "motion/react";
-import { ShoppingBag, X, ArrowRight } from "lucide-react";
+import { ShoppingBag, X, ArrowRight, User, Package } from "lucide-react";
 import { useState } from "react";
 import { useCategories } from "@/hooks/use-categories";
 import { useAuthStore } from "@/stores/auth-store";
 import { Logo } from "@/components/Logo";
+import { UserMenu } from "@/components/UserMenu";
 
 export const Navbar = () => {
   const { state } = useCart();
@@ -91,12 +92,7 @@ export const Navbar = () => {
         <div className="flex items-center gap-3">
           {isHydrated &&
             (user ? (
-              <button
-                onClick={logout}
-                className="hidden md:inline font-body text-[13px] text-ink/60 hover:text-ink transition-colors"
-              >
-                Logout
-              </button>
+              <UserMenu />
             ) : (
               <Link
                 href="/login"
@@ -174,15 +170,40 @@ export const Navbar = () => {
               <div className="mt-8 flex flex-col gap-3">
                 {isHydrated &&
                   (user ? (
-                    <button
-                      onClick={() => {
-                        logout();
-                        setMobileOpen(false);
-                      }}
-                      className="w-full border border-border rounded-full py-3 font-body text-sm font-medium text-ink"
-                    >
-                      Log out
-                    </button>
+                    <>
+                      <Link
+                        href="/account"
+                        onClick={() => setMobileOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 border border-border rounded-full py-3 font-body text-sm font-medium text-ink"
+                      >
+                        <User className="w-4 h-4" /> My profile
+                      </Link>
+                      <Link
+                        href="/account?tab=orders"
+                        onClick={() => setMobileOpen(false)}
+                        className="w-full flex items-center justify-center gap-2 border border-border rounded-full py-3 font-body text-sm font-medium text-ink"
+                      >
+                        <Package className="w-4 h-4" /> My orders
+                      </Link>
+                      {user.role === "ADMIN" && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setMobileOpen(false)}
+                          className="w-full text-center border border-border rounded-full py-3 font-body text-sm font-medium text-ink"
+                        >
+                          Admin dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout();
+                          setMobileOpen(false);
+                        }}
+                        className="w-full border border-border rounded-full py-3 font-body text-sm font-medium text-ink"
+                      >
+                        Log out
+                      </button>
+                    </>
                   ) : (
                     <Link
                       href="/login"

@@ -8,9 +8,14 @@
 // ----------------------------------------------------------------------------
 
 export interface User {
-  userId: string;
+  id: string;
+  name: string;
   phone: string;
   role: 'USER' | 'ADMIN';
+  address: string | null;
+  image: string | null;
+  createdAt: string;
+  userId?: string; // legacy alias from the JWT payload
 }
 
 export interface AuthResponse {
