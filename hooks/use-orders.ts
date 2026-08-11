@@ -3,10 +3,16 @@ import {
   getOrders,
   getOrder,
   createOrder,
+  createGuestOrder,
+  lookupOrder,
   getAdminOrders,
   updateOrderStatus,
 } from '@/lib/api/orders';
-import { CreateOrderPayload, OrderStatus } from '@/lib/types';
+import {
+  CreateOrderPayload,
+  CreateGuestOrderPayload,
+  OrderStatus,
+} from '@/lib/types';
 
 export function useOrders() {
   return useQuery({
@@ -15,11 +21,11 @@ export function useOrders() {
   });
 }
 
-export function useOrder(id: string) {
+export function useOrder(id: string, enabled = true) {
   return useQuery({
     queryKey: ['order', id],
     queryFn: () => getOrder(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
   });
 }
 
@@ -31,6 +37,19 @@ export function useCreateOrder() {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
+  });
+}
+
+export function useCreateGuestOrder() {
+  return useMutation({
+    mutationFn: (payload: CreateGuestOrderPayload) => createGuestOrder(payload),
+  });
+}
+
+export function useLookupOrder() {
+  return useMutation({
+    mutationFn: ({ id, phone }: { id: string; phone: string }) =>
+      lookupOrder(id, phone),
   });
 }
 

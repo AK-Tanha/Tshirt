@@ -61,7 +61,7 @@ function createInvoice(order: Order): Invoice {
   return {
     invoiceNo: `INV-${new Date().getFullYear()}-${order.id.slice(0, 4).toUpperCase()}`,
     orderId: order.id,
-    customerName: order.user?.name ?? order.phone,
+    customerName: order.name ?? order.user?.name ?? order.phone,
     phone: order.phone,
     address: order.address,
     items,
@@ -262,7 +262,7 @@ export default function OrderDetailPage() {
                   Name
                 </p>
                 <p className="text-sm font-medium mt-0.5">
-                  {order.user?.name ?? order.phone}
+                  {order.name ?? order.user?.name ?? order.phone}
                 </p>
               </div>
               <div>

@@ -11,6 +11,7 @@ import { ShoppingBag, X, ArrowRight, User, Package } from "lucide-react";
 import { useState } from "react";
 import { useCategories } from "@/hooks/use-categories";
 import { useAuthStore } from "@/stores/auth-store";
+import { useCartDrawerStore } from "@/stores/cart-drawer-store";
 import { Logo } from "@/components/Logo";
 import { UserMenu } from "@/components/UserMenu";
 
@@ -21,6 +22,7 @@ export const Navbar = () => {
   const { scrollY } = useScroll();
   const { data: categories } = useCategories();
   const { user, isHydrated, logout } = useAuthStore();
+  const setCartOpen = useCartDrawerStore((s) => s.setOpen);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 24);
@@ -101,7 +103,11 @@ export const Navbar = () => {
                 Login
               </Link>
             ))}
-          <Link href="/cart" className="relative group p-1" aria-label="Shopping bag">
+          <button
+            onClick={() => setCartOpen(true)}
+            className="relative group p-1"
+            aria-label="Open shopping bag"
+          >
             <ShoppingBag className="w-[18px] h-[18px] text-ink group-hover:opacity-60 transition-opacity" />
             <AnimatePresence>
               {cartCount > 0 && (
@@ -116,7 +122,7 @@ export const Navbar = () => {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Link>
+          </button>
         </div>
       </nav>
 

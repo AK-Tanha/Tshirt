@@ -110,6 +110,13 @@ export interface CollectionProduct {
   isActive: boolean;
   category?: { name: string } | null;
   images: { url: string; isHero?: boolean }[];
+  variants: {
+    id: string;
+    size: string;
+    color: string;
+    stock: number;
+    price: string | null;
+  }[];
 }
 
 export interface CreateCollectionPayload {
@@ -256,8 +263,9 @@ export interface Order {
   totalAmount: string; // Decimal as string
   address: string;
   phone: string;
+  name?: string | null;
   createdAt: string;
-  userId: string;
+  userId: string | null;
   items: OrderItem[];
   user?: {
     id: string;
@@ -266,12 +274,24 @@ export interface Order {
     role: string;
     address: string | null;
     createdAt: string;
-  };
+  } | null;
 }
 
 export interface CreateOrderPayload {
   address: string;
   phone: string;
+}
+
+export interface CartLineItemInput {
+  variantId: string;
+  quantity: number;
+}
+
+export interface CreateGuestOrderPayload {
+  name: string;
+  phone: string;
+  address: string;
+  items: CartLineItemInput[];
 }
 
 // ----------------------------------------------------------------------------

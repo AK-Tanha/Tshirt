@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { CartDrawer } from './CartDrawer';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
  const pathname = usePathname();
@@ -14,6 +15,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
  return (
  <>
  <Navbar />
+ <CartDrawer />
  <div className="pt-14 md:pt-16">{children}</div>
  <Footer />
  </>

@@ -278,7 +278,7 @@ export default function AdminDashboard() {
                         #{order.id.slice(0, 8)}
                       </td>
                       <td className="p-4 font-medium">
-                        {order.user?.name ?? order.phone}
+                        {order.name ?? order.user?.name ?? order.phone}
                       </td>
                       <td className="p-4 text-neutral-500 hidden sm:table-cell">
                         {order.items.length} item

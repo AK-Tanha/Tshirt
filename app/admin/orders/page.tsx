@@ -65,7 +65,7 @@ export default function AdminOrders() {
     setViewInvoice({
       invoiceNo: `INV-${new Date().getFullYear()}-${order.id.slice(0, 4).toUpperCase()}`,
       orderId: order.id,
-      customerName: order.user?.name ?? order.phone,
+      customerName: order.name ?? order.user?.name ?? order.phone,
       phone: order.phone,
       address: order.address,
       items,
@@ -158,7 +158,7 @@ export default function AdminOrders() {
               {filtered.map((order) => (
                 <tr key={order.id} className="border-t border-border text-sm hover:bg-neutral-50 transition-colors">
                   <td className="p-4 font-mono text-xs">#{order.id.slice(0, 8)}</td>
-                  <td className="p-4 font-medium">{order.user?.name ?? order.phone}</td>
+                  <td className="p-4 font-medium">{order.name ?? order.user?.name ?? order.phone}</td>
                   <td className="p-4 text-neutral-500 hidden sm:table-cell">{order.phone}</td>
                   <td className="p-4 text-neutral-500 hidden md:table-cell">{order.items.length} item{order.items.length > 1 ? 's' : ''}</td>
                   <td className="p-4 font-mono">৳{Number(order.totalAmount).toLocaleString()}</td>
@@ -200,7 +200,7 @@ export default function AdminOrders() {
               <div className="min-w-0">
                 <p className="font-mono text-xs text-neutral-500">#{order.id.slice(0, 8)}</p>
                 <p className="font-medium truncate mt-0.5">
-                  {order.user?.name ?? order.phone}
+                  {order.name ?? order.user?.name ?? order.phone}
                 </p>
               </div>
               <Badge variant={statusBadge[order.status]} className="shrink-0">

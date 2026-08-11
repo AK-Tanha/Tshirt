@@ -3,16 +3,40 @@ import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 import { useState } from 'react';
 import { Product } from '@/lib/types';
 import { useCart } from '@/context/CartContext';
-import { ShoppingBag } from 'lucide-react';
+import { getHeroImage } from '@/lib/utils';
+import { ShoppingBag, Check } from 'lucide-react';
 
 export const StickyAddToCart = ({ product }: { product: Product }) => {
  const [isVisible, setIsVisible] = useState(false);
+ const [justAdded, setJustAdded] = useState(false);
  const { scrollY } = useScroll();
  const { dispatch } = useCart();
 
  useMotionValueEvent(scrollY, "change", (latest) => {
  setIsVisible(latest > 400);
  });
+
+ const handleAdd = () => {
+ const variant =
+   product.variants.find((v) => v.stock > 0) ?? product.variants[0];
+ if (!variant) return;
+ dispatch({
+   type: "ADD_ITEM",
+   payload: {
+     variantId: variant.id,
+     productId: product.id,
+     name: product.name,
+     image: getHeroImage(product.images)?.url ?? "/placeholder.png",
+     size: variant.size,
+     color: variant.color,
+     price: Number(variant.price ?? product.basePrice),
+     stock: variant.stock,
+     quantity: 1,
+   },
+ });
+ setJustAdded(true);
+ setTimeout(() => setJustAdded(false), 1500);
+ };
 
  return (
  <motion.div
@@ -27,11 +51,20 @@ export const StickyAddToCart = ({ product }: { product: Product }) => {
    <span className="font-body text-sm text-ink/60">৳{Number(product.basePrice).toLocaleString()}</span>
  </div>
  <button
- onClick={() => dispatch({ type: 'ADD_ITEM', payload: { productId: product.id, quantity: 1 } })}
- className="bg-ink text-white px-6 py-3 rounded-full font-body text-sm font-semibold hover:bg-ink/90 transition-colors flex items-center gap-2 shrink-0 shadow-lg shadow-ink/10"
+ onClick={handleAdd}
+ className={`px-6 py-3 rounded-full font-body text-sm font-semibold flex items-center gap-2 shrink-0 shadow-lg shadow-ink/10 transition-colors ${
+   justAdded ? "bg-emerald-600 text-white" : "bg-ink text-white hover:bg-ink/90"
+ }`}
  >
- <ShoppingBag className="w-3.5 h-3.5" />
- Add to Bag
+ {justAdded ? (
+   <>
+     <Check className="w-3.5 h-3.5" /> Added
+   </>
+ ) : (
+   <>
+     <ShoppingBag className="w-3.5 h-3.5" /> Add to Bag
+   </>
+ )}
  </button>
  </div>
  </motion.div>

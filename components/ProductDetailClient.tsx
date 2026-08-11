@@ -13,8 +13,8 @@ import {
   ChevronLeft,
   Check,
 } from "lucide-react";
-import { useAddToCart } from '@/hooks/use-cart';
-import { orderImages } from '@/lib/utils';
+import { useCart } from '@/context/CartContext';
+import { getHeroImage, orderImages } from '@/lib/utils';
 
 export const ProductDetailClient = ({ product }: { product: Product }) => {
   const galleryImages = orderImages(product.images);
@@ -23,7 +23,7 @@ export const ProductDetailClient = ({ product }: { product: Product }) => {
   );
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const addToCart = useAddToCart();
+  const { dispatch } = useCart();
   const [justAdded, setJustAdded] = useState(false);
 
   const handleAddToCart = () => {
@@ -32,19 +32,22 @@ export const ProductDetailClient = ({ product }: { product: Product }) => {
     );
     if (!selectedVariant) return;
 
-    addToCart.mutate(
-      {
-        productId: product.id,
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
         variantId: selectedVariant.id,
+        productId: product.id,
+        name: product.name,
+        image: getHeroImage(product.images)?.url ?? "/placeholder.png",
+        size: selectedVariant.size,
+        color: selectedVariant.color,
+        price: Number(selectedVariant.price ?? product.basePrice),
+        stock: selectedVariant.stock,
         quantity,
       },
-      {
-        onSuccess: () => {
-          setJustAdded(true);
-          setTimeout(() => setJustAdded(false), 1800);
-        },
-      },
-    );
+    });
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1800);
   };
 
   const selectedVariant = product.variants.find((v) => v.size === selectedSize);
