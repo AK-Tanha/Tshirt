@@ -8,7 +8,7 @@ import { useOrderStore } from "@/stores/order-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useOrder, useLookupOrder } from "@/hooks/use-orders";
 import { Order, OrderStatus } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, getHeroImage } from "@/lib/utils";
 import { CheckCircle2, Package, Phone, MapPin, ChevronLeft } from "lucide-react";
 
 const statusStyles: Record<OrderStatus, string> = {
@@ -25,6 +25,8 @@ function OrderDetails({ order }: { order: Order }) {
     0,
   );
   const customerName = order.name ?? order.user?.name ?? "Customer";
+  const customerPhone = order.user?.phone ?? order.phone;
+  const customerAddress = order.user?.address ?? order.address;
 
   return (
     <div className="space-y-6">
@@ -35,7 +37,7 @@ function OrderDetails({ order }: { order: Order }) {
         </h1>
         <p className="font-body text-muted mt-3">
           Thank you, {customerName.split(" ")[0]}. We’ll call{" "}
-          <span className="text-ink font-medium">{order.phone}</span> to confirm
+          <span className="text-ink font-medium">{customerPhone}</span> to confirm
           your delivery.
         </p>
       </div>
@@ -59,7 +61,7 @@ function OrderDetails({ order }: { order: Order }) {
             <div key={item.id} className="flex items-center gap-3">
               <div className="relative w-12 h-14 rounded-lg overflow-hidden bg-stone shrink-0">
                 <Image
-                  src={item.product.images?.[0]?.url ?? "/placeholder.png"}
+                  src={getHeroImage(item.product.images)?.url ?? "/placeholder.png"}
                   alt={item.product.name}
                   fill
                   sizes="48px"
@@ -101,14 +103,14 @@ function OrderDetails({ order }: { order: Order }) {
           <MapPin className="w-4 h-4 text-ink/40 mt-0.5 shrink-0" />
           <div>
             <span className="text-muted block">Delivery address</span>
-            <span className="text-ink">{order.address}</span>
+            <span className="text-ink">{customerAddress}</span>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Phone className="w-4 h-4 text-ink/40 mt-0.5 shrink-0" />
           <div>
             <span className="text-muted block">Phone</span>
-            <span className="text-ink">{order.phone}</span>
+            <span className="text-ink">{customerPhone}</span>
           </div>
         </div>
       </div>
