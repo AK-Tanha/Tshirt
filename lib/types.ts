@@ -318,11 +318,26 @@ export interface Customer {
   name: string;
   phone: string;
   address: string | null;
+  image?: string | null;
   createdAt: string;
   _count?: {
     orders: number;
   };
   orders?: Order[];
+}
+
+export interface CreateCustomerPayload {
+  name: string;
+  phone: string;
+  password: string;
+  address?: string;
+}
+
+export interface UpdateCustomerPayload {
+  name?: string;
+  phone?: string;
+  address?: string;
+  password?: string;
 }
 
 // ----------------------------------------------------------------------------

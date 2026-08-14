@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Phone, Calendar, ShoppingBag, TrendingUp, Package } from 'lucide-react';
+import Image from 'next/image';
 import { useCustomer } from '@/hooks/use-customers';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -69,9 +70,19 @@ export default function CustomerDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-1 p-6">
           <div className="flex flex-col items-center text-center">
-            <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center text-2xl font-medium text-neutral-600 mb-4">
-              {customer.name.charAt(0)}
-            </div>
+            {customer.image ? (
+              <Image
+                src={customer.image}
+                alt={customer.name}
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-full object-cover mb-4"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center text-2xl font-medium text-neutral-600 mb-4">
+                {customer.name.charAt(0)}
+              </div>
+            )}
             <h2 className="font-display text-xl font-bold">{customer.name}</h2>
             <div className="w-full space-y-3 mt-6 text-sm">
               <div className="flex items-center gap-3 text-neutral-500">

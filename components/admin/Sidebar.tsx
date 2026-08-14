@@ -14,12 +14,10 @@ export default function Sidebar({ collapsed, onToggle, onNavigate }: {
   onNavigate?: () => void;
 }) {
  const pathname = usePathname();
- const [expanded, setExpanded] = useState<string[]>(['Catalog', 'Inventory', 'Orders']);
+ const [expanded, setExpanded] = useState<string | null>('Orders');
 
  const toggleSection = (label: string) => {
- setExpanded((prev) =>
- prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
- );
+ setExpanded((prev) => (prev === label ? null : label));
  };
 
  const matchActive = (href: string) =>
@@ -66,7 +64,7 @@ export default function Sidebar({ collapsed, onToggle, onNavigate }: {
  ? (item.href === '/admin' ? pathname === item.href : matchActive(item.href))
  : !!matchedChild;
 
- const open = expanded.includes(item.label);
+ const open = expanded === item.label;
 
  return (
  <div key={item.label}>

@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { useToast } from '@/components/ui/Toast';
 import {
   Search, Filter, ChevronDown, Eye, X, Check, Truck, PackageCheck,
-  RotateCcw, FileText, Download,
+  RotateCcw, FileText, Download, Plus,
 } from 'lucide-react';
 
 const statusBadge: Record<string, 'warning' | 'info' | 'neutral' | 'success' | 'danger'> = {
@@ -84,9 +84,18 @@ export default function AdminOrders() {
           <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Orders</h1>
           <p className="text-sm text-neutral-500 mt-1">{filtered.length} of {orders.length} orders</p>
         </div>
-        <span className="text-xs text-neutral-500 bg-neutral-100 px-3 py-1.5 rounded-lg font-mono">
-          {orders.length} total
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-neutral-500 bg-neutral-100 px-3 py-1.5 rounded-lg font-mono hidden sm:inline">
+            {orders.length} total
+          </span>
+          <Link
+            href="/admin/orders/create"
+            className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Add New Order</span>
+          </Link>
+        </div>
       </div>
 
       <Card>
