@@ -1,8 +1,11 @@
+"use client";
 import React from 'react';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
+import { useSite } from '@/hooks/use-site';
 
 export const Footer = () => {
+ const { data: site } = useSite();
  return (
  <footer className="bg-ink text-white mt-20 md:mt-28">
  <div className="px-page max-w-7xl mx-auto py-14 md:py-20">
@@ -12,7 +15,7 @@ export const Footer = () => {
   href="/"
   className="block mb-4"
  >
-  <Logo variant="white" alt="Apan" className="h-10 md:h-12 w-auto" />
+  <Logo variant="white" alt={site?.siteName ?? "Apan"} src={site?.logoUrl ?? undefined} className="h-10 md:h-12 w-auto" />
  </Link>
  <p className="font-body text-sm text-white/50 max-w-sm leading-relaxed">
   Crafting the future of apparel through high-quality materials and timeless
@@ -101,9 +104,9 @@ export const Footer = () => {
  </div>
 
  <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
- <p className="font-mono text-[9px] text-white/30 tracking-wider">
-  © 2026 APAN APPAREL
- </p>
+<p className="font-mono text-[9px] text-white/30 tracking-wider">
+   © 2026 {(site?.siteName ?? "APAN APPAREL").toUpperCase()}
+  </p>
  <div className="flex gap-6 font-mono text-[9px] text-white/30 tracking-wider">
  <span>Privacy</span>
  <span>Terms</span>

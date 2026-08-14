@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { navItems } from '@/lib/navigation';
+import { useSite } from '@/hooks/use-site';
 import { ChevronDown, LogOut, PanelLeftClose, PanelLeft, Store } from 'lucide-react';
 
 export default function Sidebar({ collapsed, onToggle, onNavigate }: {
@@ -15,6 +16,7 @@ export default function Sidebar({ collapsed, onToggle, onNavigate }: {
 }) {
  const pathname = usePathname();
  const [expanded, setExpanded] = useState<string | null>('Orders');
+ const { data: site } = useSite();
 
  const toggleSection = (label: string) => {
  setExpanded((prev) => (prev === label ? null : label));
@@ -35,7 +37,7 @@ export default function Sidebar({ collapsed, onToggle, onNavigate }: {
   <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center shrink-0">
   <Store className="w-4 h-4 text-white " />
   </div>
-  <span className="font-display text-base font-bold tracking-tight truncate">APAN</span>
+  <span className="font-display text-base font-bold tracking-tight truncate">{(site?.siteName ?? "APAN").toUpperCase()}</span>
   </Link>
   <button
   onClick={onToggle}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLogin } from '@/hooks/use-auth';
+import { useSite } from '@/hooks/use-site';
 import { Logo } from '@/components/Logo';
 
 export default function LoginPage() {
@@ -10,6 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { mutate, isPending, error } = useLogin();
+  const { data: site } = useSite();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +30,8 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <Link href="/" className="group flex flex-col items-center mb-10">
           <Logo
-            alt="APAN"
+            alt={site?.siteName ?? "APAN"}
+            src={site?.logoUrl ?? undefined}
             priority
             className="h-14 w-auto group-hover:scale-105 transition-transform duration-300"
           />

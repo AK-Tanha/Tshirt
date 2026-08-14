@@ -333,6 +333,20 @@ export interface CreateCustomerPayload {
   address?: string;
 }
 
+export interface SiteSettings {
+  id: string;
+  siteName: string;
+  logoUrl?: string | null;
+  description?: string | null;
+  updatedAt?: string;
+}
+
+export interface UpdateSitePayload {
+  siteName?: string;
+  logoUrl?: string;
+  description?: string;
+}
+
 export interface UpdateCustomerPayload {
   name?: string;
   phone?: string;

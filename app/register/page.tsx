@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '@/hooks/use-auth';
+import { useSite } from '@/hooks/use-site';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -10,6 +11,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { mutate, isPending, error } = useRegister();
+  const { data: site } = useSite();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +30,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <Link href="/" className="group flex flex-col items-center mb-10">
           <span className="font-display text-4xl tracking-[0.15em] text-black font-bold leading-none group-hover:scale-105 transition-transform duration-300">
-            APAN
+            {site?.siteName ?? "APAN"}
           </span>
           <span className="text-[10px] tracking-[0.3em] uppercase text-black/60 -mt-1">
             Fashion
@@ -38,7 +40,7 @@ export default function RegisterPage() {
         <div className="bg-white border border-border rounded-2xl p-8 shadow-sm animate-fade-in">
           <h1 className="text-xl font-semibold text-center">Create account</h1>
           <p className="text-sm text-muted text-center mt-1 mb-8">
-            Join APAN and start shopping
+            Join {(site?.siteName ?? "APAN")} and start shopping
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

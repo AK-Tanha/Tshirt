@@ -5,6 +5,7 @@ interface LogoProps {
   variant?: "ink" | "white";
   alt?: string;
   priority?: boolean;
+  src?: string;
 }
 
 export const Logo = ({
@@ -12,14 +13,14 @@ export const Logo = ({
   variant = "ink",
   alt = "Apan Apparel",
   priority,
+  src,
 }: LogoProps) => {
-  const src =
-    variant === "white"
-      ? "/apan-logo-white.png"
-      : "/apan-logo-ink.png";
+  const imageSrc =
+    src ??
+    (variant === "white" ? "/apan-logo-white.png" : "/apan-logo-ink.png");
   return (
     <Image
-      src={src}
+      src={imageSrc}
       alt={alt}
       width={608}
       height={311}

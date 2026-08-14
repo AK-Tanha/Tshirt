@@ -12,6 +12,7 @@ import {
 import { ShoppingBag, ArrowRight, User, Package } from "lucide-react";
 import { useState } from "react";
 import { useCategories } from "@/hooks/use-categories";
+import { useSite } from "@/hooks/use-site";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCartDrawerStore } from "@/stores/cart-drawer-store";
 import { Logo } from "@/components/Logo";
@@ -25,6 +26,7 @@ export const Navbar = () => {
   const { scrollY } = useScroll();
   const pathname = usePathname();
   const { data: categories } = useCategories();
+  const { data: site } = useSite();
   const { user, logout } = useAuthStore();
   const setCartOpen = useCartDrawerStore((s) => s.setOpen);
 
@@ -97,9 +99,9 @@ export const Navbar = () => {
             href="/"
             onClick={() => setMobileOpen(false)}
             className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center"
-            aria-label="Apan Apparel home"
+            aria-label={`${site?.siteName ?? "Apan Apparel"} home`}
           >
-            <Logo priority className="h-8 md:h-9 w-auto" />
+            <Logo priority src={site?.logoUrl ?? undefined} className="h-8 md:h-9 w-auto" />
           </Link>
 
           {/* Desktop links */}

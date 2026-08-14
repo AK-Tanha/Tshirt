@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/Toast';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Save, Store, CreditCard, Bell, Shield, Globe, FileText, Mail } from 'lucide-react';
+import { useSite, useUpdateSite } from '@/hooks/use-site';
+import { Save, Store, CreditCard, Bell, Shield, Globe, FileText, Mail, Loader2 } from 'lucide-react';
 
 const STORAGE_KEY = 'admin_settings';
 type Tab = 'general' | 'payment' | 'notifications' | 'email';
@@ -32,7 +33,8 @@ function loadSettings() {
 
 export default function AdminSettings() {
  const [tab, setTab] = useState<Tab>('general');
- const [storeName, setStoreName] = useState(() => loadSettings()?.storeName ?? 'Apan Apparel');
+ const [storeName, setStoreName] = useState('');
+ const [logoUrl, setLogoUrl] = useState('');
  const [storeEmail, setStoreEmail] = useState(() => loadSettings()?.storeEmail ?? 'hello@apanapparel.com');
  const [storePhone, setStorePhone] = useState(() => loadSettings()?.storePhone ?? '+880 1700-000000');
  const [storeAddress, setStoreAddress] = useState(() => loadSettings()?.storeAddress ?? 'Dhaka, Bangladesh');
@@ -40,12 +42,23 @@ export default function AdminSettings() {
  const [codEnabled, setCodEnabled] = useState(() => loadSettings()?.codEnabled ?? true);
  const [orderNotification, setOrderNotification] = useState(() => loadSettings()?.orderNotification ?? true);
  const [stockAlert, setStockAlert] = useState(() => loadSettings()?.stockAlert ?? true);
+ const { data: site, isLoading: siteLoading } = useSite();
+ const { mutate: saveSite, isPending: saving } = useUpdateSite();
  const { toast } = useToast();
 
+ const nameValue = storeName || site?.siteName || '';
+ const logoValue = logoUrl || site?.logoUrl || '';
+
  const handleSave = () => {
- const settings = { storeName, storeEmail, storePhone, storeAddress, currency, codEnabled, orderNotification, stockAlert };
+ const settings = { storeEmail, storePhone, storeAddress, currency, codEnabled, orderNotification, stockAlert };
  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
- toast('Settings saved successfully');
+ saveSite(
+   { siteName: nameValue, logoUrl: logoValue || undefined },
+   {
+   onSuccess: () => toast('Settings saved successfully'),
+   onError: (err: { message?: string }) => toast(err?.message || 'Failed to save settings', 'error'),
+   },
+ );
  };
 
  return (
@@ -57,10 +70,11 @@ export default function AdminSettings() {
  </div>
  <button
  onClick={handleSave}
- className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
+ disabled={saving || siteLoading}
+ className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
  >
- <Save className="w-4 h-4" />
- Save Changes
+ {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+ {saving ? 'Saving...' : 'Save Changes'}
  </button>
  </div>
 
@@ -96,7 +110,11 @@ export default function AdminSettings() {
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div>
  <label className="text-xs text-neutral-500 uppercase tracking-wider font-medium mb-1.5 block">Store Name</label>
- <input type="text" value={storeName} onChange={(e) => setStoreName(e.target.value)} className="w-full px-4 py-2.5 bg-neutral-100 border-none rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-300 transition-all" />
+ <input type="text" value={nameValue} onChange={(e) => setStoreName(e.target.value)} className="w-full px-4 py-2.5 bg-neutral-100 border-none rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-300 transition-all" />
+ </div>
+ <div>
+ <label className="text-xs text-neutral-500 uppercase tracking-wider font-medium mb-1.5 block">Logo URL</label>
+ <input type="text" value={logoValue} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://.../logo.png" className="w-full px-4 py-2.5 bg-neutral-100 border-none rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-300 transition-all" />
  </div>
  <div>
  <label className="text-xs text-neutral-500 uppercase tracking-wider font-medium mb-1.5 block">Email</label>
