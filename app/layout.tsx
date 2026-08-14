@@ -92,7 +92,7 @@ export default async function RootLayout({
             alignItems: "center",
             justifyContent: "center",
             background: "#ffffff",
-            transition: "opacity 0.4s ease",
+            transition: "opacity 0.4s ease, visibility 0.4s ease",
           }}
         >
           <div style={{ textAlign: "center", animation: "apan-in 0.6s ease-out both" }}>
@@ -138,7 +138,8 @@ export default async function RootLayout({
                 if (done || !el) return;
                 done = true;
                 el.style.opacity = '0';
-                setTimeout(function(){ if (el && el.parentNode) el.parentNode.removeChild(el); }, 450);
+                el.style.visibility = 'hidden';
+                el.style.pointerEvents = 'none';
               }
               window.addEventListener('load', function(){ setTimeout(hide, 250); });
               setTimeout(hide, 4000);
