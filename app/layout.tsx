@@ -24,8 +24,14 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Apan Apparel",
-  description: "Premium Polos and T-Shirts for the modern Bangladeshi.",
+  title: "APAN Apparel",
+  description: "Premium Polos, T-Shirts, Activewear, and Kids Wear for the modern Bangladeshi.",
+  icons: {  
+    icon: [
+      { url: "/apan-logo-ink.png", media: "(prefers-color-scheme: light)" },
+      { url: "/apan-logo-white.png", media: "(prefers-color-scheme: dark)" },
+    ],
+  },
 };
 
 export default function RootLayout({
