@@ -15,6 +15,7 @@ import { Loader2, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 interface VariantForm {
   size: string;
   color: string;
+  colorName: string;
   stock: string;
   price: string;
 }
@@ -38,7 +39,7 @@ export default function CreateProductPage() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [heroUrl, setHeroUrl] = useState<string>('');
   const [variants, setVariants] = useState<VariantForm[]>([
-    { size: 'M', color: '', stock: '0', price: '' },
+    { size: 'M', color: '#000000', colorName: '', stock: '0', price: '' },
   ]);
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -56,7 +57,7 @@ export default function CreateProductPage() {
   };
 
   const addVariant = () => {
-    setVariants((prev) => [...prev, { size: 'M', color: '', stock: '0', price: '' }]);
+    setVariants((prev) => [...prev, { size: 'M', color: '#000000', colorName: '', stock: '0', price: '' }]);
   };
 
   const removeVariant = (index: number) => {
@@ -82,7 +83,7 @@ export default function CreateProductPage() {
           .filter((v) => v.color.trim())
           .map((v) => ({
             size: v.size,
-            color: v.color.trim(),
+            color: v.colorName.trim() || v.color,
             stock: Math.max(0, parseInt(v.stock) || 0),
             price: v.price ? Number(v.price) : undefined,
           })),
@@ -249,13 +250,21 @@ export default function CreateProductPage() {
                   </div>
                   <div className="col-span-2">
                     <label className="text-[10px] text-muted uppercase tracking-wider mb-1 block">Color</label>
-                    <input
-                      type="text"
-                      value={v.color}
-                      onChange={(e) => updateVariant(i, 'color', e.target.value)}
-                      placeholder="Navy"
-                      className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
-                    />
+                    <div className="flex gap-1.5">
+                      <input
+                        type="color"
+                        value={v.color}
+                        onChange={(e) => updateVariant(i, 'color', e.target.value)}
+                        className="h-[38px] w-10 shrink-0 px-1 py-1 bg-white border border-border rounded-lg cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={v.colorName}
+                        onChange={(e) => updateVariant(i, 'colorName', e.target.value)}
+                        placeholder="Name, e.g. Navy"
+                        className="flex-1 min-w-0 px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="text-[10px] text-muted uppercase tracking-wider mb-1 block">Stock</label>

@@ -35,6 +35,7 @@ export const navItems: NavItem[] = [
   label: 'Orders', icon: ClipboardList,
   children: [
   { href: '/admin/orders', label: 'All Orders' },
+  { href: '/admin/orders/create', label: 'Create Order' },
   ],
   },
  {

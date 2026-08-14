@@ -294,6 +294,14 @@ export interface CreateGuestOrderPayload {
   items: CartLineItemInput[];
 }
 
+export interface AdminCreateOrderPayload {
+  customerId?: string;
+  name: string;
+  phone: string;
+  address: string;
+  items: CartLineItemInput[];
+}
+
 // ----------------------------------------------------------------------------
 // Customers (admin)
 // ----------------------------------------------------------------------------

@@ -22,7 +22,7 @@ export interface DashboardData {
   totalYearRevenue: number;
   orderCountYear: number;
   maxRevenue: number;
-  topProducts: { name: string; sales: number; revenue: number }[];
+  topProducts: { id: string; name: string; sales: number; revenue: number }[];
   categoryBreakdown: { category: string; count: number; revenue: number; percentage: number }[];
   recentOrders: Order[];
 }
@@ -62,7 +62,7 @@ export function buildDashboard(orders: Order[], products: Product[], users: User
   let orderCountYear = 0;
 
   const monthRevenue = new Array<number>(12).fill(0);
-  const productMap = new Map<string, { name: string; sales: number; revenue: number }>();
+  const productMap = new Map<string, { id: string; name: string; sales: number; revenue: number }>();
   const categoryRevenue = new Map<string, number>();
 
   for (const o of orders) {
@@ -94,7 +94,7 @@ export function buildDashboard(orders: Order[], products: Product[], users: User
       const catName = item.product.category?.name ?? "Uncategorized";
       categoryRevenue.set(catName, (categoryRevenue.get(catName) ?? 0) + lineRevenue);
 
-      const cur = productMap.get(item.product.id) ?? { name: item.product.name, sales: 0, revenue: 0 };
+      const cur = productMap.get(item.product.id) ?? { id: item.product.id, name: item.product.name, sales: 0, revenue: 0 };
       cur.sales += item.quantity;
       cur.revenue += lineRevenue;
       productMap.set(item.product.id, cur);

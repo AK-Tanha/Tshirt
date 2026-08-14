@@ -3,6 +3,7 @@ import {
   Order,
   CreateOrderPayload,
   CreateGuestOrderPayload,
+  AdminCreateOrderPayload,
   OrderStatus,
 } from '@/lib/types';
 
@@ -37,6 +38,17 @@ export function lookupOrder(id: string, phone: string) {
 
 export function getAdminOrders() {
   return apiFetch<Order[]>('/orders/admin/all');
+}
+
+export function getAdminOrder(id: string) {
+  return apiFetch<Order>(`/orders/admin/${id}`);
+}
+
+export function createAdminOrder(payload: AdminCreateOrderPayload) {
+  return apiFetch<Order>('/orders/admin/create', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }
 
 export function updateOrderStatus(id: string, status: OrderStatus) {

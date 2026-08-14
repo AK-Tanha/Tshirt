@@ -316,7 +316,7 @@ export default function AdminDashboard() {
             ) : (
               d.topProducts.map((product, i) => (
                 <div
-                  key={product.name}
+                  key={product.id}
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3 min-w-0">

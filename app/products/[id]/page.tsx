@@ -22,7 +22,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const product = await fetchProductSafe(id);
-  if (!product) return {};
+  if (!product || !product.isActive) return {};
   const hero = getHeroImage(product.images);
 
   return {
@@ -43,7 +43,7 @@ export default async function ProductDetail({
 }) {
   const { id } = await params;
   const product = await fetchProductSafe(id);
-  if (!product) notFound();
+  if (!product || !product.isActive) notFound();
 
   return (
     <main className="px-page max-w-7xl mx-auto pb-28 md:pb-32">

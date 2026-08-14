@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
-import { useOrder, useUpdateOrderStatus } from "@/hooks/use-orders";
+import { useAdminOrder, useUpdateOrderStatus } from "@/hooks/use-orders";
 import type { Order, Invoice, InvoiceItem } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
@@ -77,7 +77,7 @@ export default function OrderDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const { toast } = useToast();
-  const { data: order, isLoading } = useOrder(params.id);
+  const { data: order, isLoading } = useAdminOrder(params.id);
   const updateStatus = useUpdateOrderStatus();
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
 
