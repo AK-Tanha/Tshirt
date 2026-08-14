@@ -8,12 +8,15 @@ import {
   getAdminOrders,
   getAdminOrder,
   createAdminOrder,
+  updateAdminOrder,
+  deleteAdminOrder,
   updateOrderStatus,
 } from '@/lib/api/orders';
 import {
   CreateOrderPayload,
   CreateGuestOrderPayload,
   AdminCreateOrderPayload,
+  AdminUpdateOrderPayload,
   OrderStatus,
 } from '@/lib/types';
 
@@ -68,6 +71,31 @@ export function useAdminOrder(id: string) {
     queryKey: ['admin-order', id],
     queryFn: () => getAdminOrder(id),
     enabled: !!id,
+  });
+}
+
+export function useUpdateAdminOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: AdminUpdateOrderPayload }) =>
+      updateAdminOrder(id, payload),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-order', id] });
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
+export function useDeleteAdminOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteAdminOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-order'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
   });
 }
 

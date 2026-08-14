@@ -302,6 +302,13 @@ export interface AdminCreateOrderPayload {
   items: CartLineItemInput[];
 }
 
+export interface AdminUpdateOrderPayload {
+  name?: string;
+  phone?: string;
+  address?: string;
+  items?: CartLineItemInput[];
+}
+
 // ----------------------------------------------------------------------------
 // Customers (admin)
 // ----------------------------------------------------------------------------

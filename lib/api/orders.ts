@@ -4,6 +4,7 @@ import {
   CreateOrderPayload,
   CreateGuestOrderPayload,
   AdminCreateOrderPayload,
+  AdminUpdateOrderPayload,
   OrderStatus,
 } from '@/lib/types';
 
@@ -42,6 +43,17 @@ export function getAdminOrders() {
 
 export function getAdminOrder(id: string) {
   return apiFetch<Order>(`/orders/admin/${id}`);
+}
+
+export function updateAdminOrder(id: string, payload: AdminUpdateOrderPayload) {
+  return apiFetch<Order>(`/orders/admin/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteAdminOrder(id: string) {
+  return apiFetch<Order>(`/orders/admin/${id}`, { method: 'DELETE' });
 }
 
 export function createAdminOrder(payload: AdminCreateOrderPayload) {

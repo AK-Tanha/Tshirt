@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
-import { useAdminOrder, useUpdateOrderStatus } from "@/hooks/use-orders";
+import {
+  useAdminOrder,
+  useUpdateOrderStatus,
+  useUpdateAdminOrder,
+  useDeleteAdminOrder,
+} from "@/hooks/use-orders";
+import { useProducts } from "@/hooks/use-products";
 import type { Order, Invoice, InvoiceItem } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   ArrowLeft,
   Check,
@@ -25,6 +32,10 @@ import {
   User,
   CreditCard,
   Package,
+  Edit3,
+  Trash2,
+  Plus,
+  Loader2,
 } from "lucide-react";
 
 const statusBadge: Record<string, "warning" | "info" | "neutral" | "success" | "danger"> = {
@@ -44,6 +55,15 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusFlow = ["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED"] as const;
+
+interface EditLine {
+  id: string;
+  variantId: string;
+  quantity: string;
+}
+
+const editInputClass =
+  "w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none transition-all duration-200 focus:border-black focus:ring-1 focus:ring-black/10";
 
 function createInvoice(order: Order): Invoice {
   const items: InvoiceItem[] = order.items.map((item) => {
@@ -79,7 +99,35 @@ export default function OrderDetailPage() {
   const { toast } = useToast();
   const { data: order, isLoading } = useAdminOrder(params.id);
   const updateStatus = useUpdateOrderStatus();
+  const updateOrder = useUpdateAdminOrder();
+  const deleteOrder = useDeleteAdminOrder();
+  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 100 });
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editAddress, setEditAddress] = useState("");
+  const [editItems, setEditItems] = useState<EditLine[]>([]);
+
+  const allVariants = useMemo(
+    () =>
+      (productsData?.data ?? []).flatMap((p) =>
+        p.variants.map((v) => ({ ...v, productName: p.name, basePrice: p.basePrice })),
+      ),
+    [productsData],
+  );
+
+  const editUnitPrice = (variantId: string) => {
+    const v = allVariants.find((x) => x.id === variantId);
+    return v ? Number(v.price ?? v.basePrice) : 0;
+  };
+
+  const editValidItems = editItems.filter((it) => it.variantId && Number(it.quantity) > 0);
+  const editTotal = editValidItems.reduce(
+    (sum, it) => sum + editUnitPrice(it.variantId) * Number(it.quantity),
+    0,
+  );
 
   if (isLoading) {
     return (
@@ -116,6 +164,70 @@ export default function OrderDetailPage() {
     );
   };
 
+  const startEdit = () => {
+    setEditName(order.name ?? order.user?.name ?? "");
+    setEditPhone(order.phone);
+    setEditAddress(order.address);
+    setEditItems(
+      order.items.map((it) => ({
+        id: crypto.randomUUID(),
+        variantId: it.variantId,
+        quantity: String(it.quantity),
+      })),
+    );
+    setEditing(true);
+  };
+
+  const updateEditItem = (id: string, patch: Partial<EditLine>) => {
+    setEditItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patch } : it)));
+  };
+
+  const addEditItem = () => {
+    setEditItems((prev) => [...prev, { id: crypto.randomUUID(), variantId: "", quantity: "1" }]);
+  };
+
+  const removeEditItem = (id: string) => {
+    setEditItems((prev) => prev.filter((it) => it.id !== id));
+  };
+
+  const saveEdit = () => {
+    if (!editName.trim() || !editPhone.trim() || !editAddress.trim() || editValidItems.length === 0) {
+      toast("Name, phone, address and at least one valid line item are required", "error");
+      return;
+    }
+    updateOrder.mutate(
+      {
+        id: order.id,
+        payload: {
+          name: editName.trim(),
+          phone: editPhone.trim(),
+          address: editAddress.trim(),
+          items: editValidItems.map((it) => ({
+            variantId: it.variantId,
+            quantity: Number(it.quantity),
+          })),
+        },
+      },
+      {
+        onSuccess: () => {
+          toast(`Order ${order.id.slice(0, 8)} updated`, "success");
+          setEditing(false);
+        },
+        onError: (err) => toast(err.message, "error"),
+      },
+    );
+  };
+
+  const handleDelete = () => {
+    deleteOrder.mutate(order.id, {
+      onSuccess: () => {
+        toast(`Order ${order.id.slice(0, 8)} deleted`, "error");
+        router.push("/admin/orders");
+      },
+      onError: (err) => toast(err.message, "error"),
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -144,6 +256,51 @@ export default function OrderDetailPage() {
             })}
           </p>
         </div>
+        {editing ? (
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={() => setEditing(false)}
+              disabled={updateOrder.isPending}
+              className="px-4 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-neutral-100 transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={saveEdit}
+              disabled={updateOrder.isPending}
+              className="flex items-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-50"
+            >
+              {updateOrder.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
+              Save Changes
+            </button>
+          </div>
+        ) : (
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={startEdit}
+              className="flex items-center gap-2 px-4 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-neutral-100 transition-colors"
+            >
+              <Edit3 className="w-4 h-4" />
+              Edit
+            </button>
+            <button
+              onClick={() => setDeleteOpen(true)}
+              disabled={deleteOrder.isPending}
+              className="flex items-center gap-2 px-4 py-2.5 border border-red-200 text-red-600 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+            >
+              {deleteOrder.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4" />
+              )}
+              Delete
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -214,35 +371,120 @@ export default function OrderDetailPage() {
 
           <Card className="p-6">
             <CardTitle className="mb-4">Order Items</CardTitle>
-            <div className="space-y-3">
-              {order.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between py-3 border-b border-border last:border-0"
+            {editing ? (
+              <div className="space-y-3 mb-4">
+                {editItems.map((item) => {
+                  const selected = allVariants.find((v) => v.id === item.variantId);
+                  return (
+                    <div
+                      key={item.id}
+                      className="grid grid-cols-12 gap-2 items-end border border-border rounded-lg p-3"
+                    >
+                      <div className="col-span-12 sm:col-span-6">
+                        <label className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1 block">
+                          Product / Variant
+                        </label>
+                        {productsLoading ? (
+                          <div className="h-[42px] flex items-center px-3 text-sm text-neutral-400">
+                            Loading variants...
+                          </div>
+                        ) : (
+                          <select
+                            value={item.variantId}
+                            onChange={(e) => updateEditItem(item.id, { variantId: e.target.value })}
+                            className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
+                          >
+                            <option value="">Select variant...</option>
+                            {allVariants.map((v) => (
+                              <option key={v.id} value={v.id}>
+                                {v.productName} · {v.size} / {v.color} · ৳
+                                {editUnitPrice(v.id).toLocaleString()} (stock {v.stock})
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                      <div className="col-span-4 sm:col-span-2">
+                        <label className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1 block">
+                          Qty
+                        </label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={item.quantity}
+                          onChange={(e) => updateEditItem(item.id, { quantity: e.target.value })}
+                          className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
+                        />
+                      </div>
+                      <div className="col-span-4 sm:col-span-3">
+                        <label className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1 block">
+                          Line Total
+                        </label>
+                        <div className="h-[42px] flex items-center px-3 text-sm font-mono bg-neutral-50 border border-border rounded-lg">
+                          {selected
+                            ? `৳${(editUnitPrice(item.variantId) * Number(item.quantity || 0)).toLocaleString()}`
+                            : "—"}
+                        </div>
+                      </div>
+                      <div className="col-span-4 sm:col-span-1 flex justify-end">
+                        {selected && selected.stock < Number(item.quantity) && (
+                          <span className="text-[10px] text-red-600 mr-2 self-center">
+                            Only {selected.stock} left
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeEditItem(item.id)}
+                          className="p-2 text-neutral-400 hover:text-red-600 transition-colors"
+                          aria-label="Remove item"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={addEditItem}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border border-border rounded-lg hover:bg-neutral-100 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center">
-                      <Package className="w-4 h-4 text-neutral-500" />
+                  <Plus className="w-3.5 h-3.5" /> Add Item
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {order.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center">
+                        <Package className="w-4 h-4 text-neutral-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {item.product.name}
+                        </p>
+                        <p className="text-xs text-neutral-500">
+                          {item.variant.size} / {item.variant.color} &middot; Qty: {item.quantity}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        {item.product.name}
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        {item.variant.size} / {item.variant.color} &middot; Qty: {item.quantity}
-                      </p>
-                    </div>
+                    <span className="font-mono text-sm">
+                      ৳{(Number(item.variant.price ?? item.product.basePrice) * item.quantity).toLocaleString()}
+                    </span>
                   </div>
-                  <span className="font-mono text-sm">
-                    ৳{(Number(item.variant.price ?? item.product.basePrice) * item.quantity).toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             <div className="flex items-center justify-between pt-4 mt-2 border-t border-border">
-              <span className="text-sm text-neutral-500">Total Amount</span>
+              <span className="text-sm text-neutral-500">
+                {editing ? "New Total" : "Total Amount"}
+              </span>
               <span className="font-display text-2xl font-bold">
-                ৳{Number(order.totalAmount).toLocaleString()}
+                ৳{(editing ? editTotal : Number(order.totalAmount)).toLocaleString()}
               </span>
             </div>
           </Card>
@@ -256,28 +498,66 @@ export default function OrderDetailPage() {
               </div>
               <CardTitle>Customer</CardTitle>
             </div>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
-                  Name
-                </p>
-                <p className="text-sm font-medium mt-0.5">
-                  {order.name ?? order.user?.name ?? order.phone}
-                </p>
+            {editing ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1 block">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className={editInputClass}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1 block">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    className={editInputClass}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-neutral-500 uppercase tracking-wider mb-1 block">
+                    Address
+                  </label>
+                  <textarea
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    rows={2}
+                    className={cn(editInputClass, "resize-none")}
+                  />
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
-                  Phone
-                </p>
-                <p className="text-sm mt-0.5">{order.phone}</p>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
+                    Name
+                  </p>
+                  <p className="text-sm font-medium mt-0.5">
+                    {order.name ?? order.user?.name ?? order.phone}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
+                    Phone
+                  </p>
+                  <p className="text-sm mt-0.5">{order.phone}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
+                    Address
+                  </p>
+                  <p className="text-sm mt-0.5">{order.address}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
-                  Address
-                </p>
-                <p className="text-sm mt-0.5">{order.address}</p>
-              </div>
-            </div>
+            )}
           </Card>
 
           <Card className="p-6">
@@ -371,6 +651,16 @@ export default function OrderDetailPage() {
           />
         )}
       </AnimatePresence>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        title="Delete Order"
+        message={`Are you sure you want to delete Order #${order.id.slice(0, 8)}? The items' stock will be returned. This action cannot be undone.`}
+        confirmLabel="Delete Order"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteOpen(false)}
+      />
     </div>
   );
 }
