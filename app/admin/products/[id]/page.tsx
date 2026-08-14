@@ -9,12 +9,7 @@ import { useProduct } from "@/hooks/use-products";
 import { useSuppliers } from "@/hooks/use-suppliers";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardTitle } from "@/components/ui/Card";
-import {
-  ArrowLeft,
-  Edit3,
-  ShoppingCart,
-  Store,
-} from "lucide-react";
+import { ArrowLeft, Edit3, ShoppingCart, Store } from "lucide-react";
 
 function getStockInfo(variants: { stock: number }[]): {
   label: string;
@@ -72,9 +67,7 @@ export default function ProductDetailPage() {
               </h1>
               <Badge variant={stock.variant}>{stock.label}</Badge>
             </div>
-            <p className="text-sm text-neutral-500 mt-1">
-              ID: {product.id}
-            </p>
+            <p className="text-sm text-neutral-500 mt-1">ID: {product.id}</p>
           </div>
         </div>
         <Link
@@ -117,7 +110,12 @@ export default function ProductDetailPage() {
                             : "border-transparent",
                         )}
                       >
-                        <Image src={img.url} alt="" fill className="object-cover" />
+                        <Image
+                          src={img.url}
+                          alt=""
+                          fill
+                          className="object-cover"
+                        />
                         {img.isHero && (
                           <span className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[7px] font-mono uppercase tracking-wider text-center py-0.5">
                             Hero
@@ -129,14 +127,6 @@ export default function ProductDetailPage() {
                 )}
               </div>
               <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
-                    Category
-                  </p>
-                  <Badge variant="neutral" className="mt-1">
-                    {product.category?.name ?? "—"}
-                  </Badge>
-                </div>
                 <div>
                   <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
                     Price
@@ -152,6 +142,24 @@ export default function ProductDetailPage() {
                   <p className="text-sm text-neutral-600 mt-1 leading-relaxed">
                     {product.description}
                   </p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
+                      Category
+                    </p>
+                    <Badge variant="neutral" className="mt-1">
+                      {product.category?.name ?? "—"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider font-medium">
+                      Brand
+                    </p>
+                    <Badge variant="neutral" className="mt-1">
+                      {product.brand?.name ?? "—"}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
@@ -174,9 +182,7 @@ export default function ProductDetailPage() {
                     <tr key={v.id} className="border-b border-border/50">
                       <td className="py-3 font-medium">{v.size}</td>
                       <td className="py-3 text-neutral-500">{v.color}</td>
-                      <td className="py-3 text-right font-mono">
-                        {v.stock}
-                      </td>
+                      <td className="py-3 text-right font-mono">{v.stock}</td>
                       <td className="py-3 text-right">
                         {v.stock === 0 ? (
                           <Badge variant="danger">Out</Badge>
