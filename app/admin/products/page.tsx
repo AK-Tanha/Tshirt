@@ -166,7 +166,7 @@ export default function AdminProducts() {
                             {product.name}
                           </Link>
                           <p className="text-xs text-neutral-500 truncate">
-                            {product.description}
+                            {product?.description?.substring(0, 50) + "..."}
                           </p>
                         </div>
                       </div>
