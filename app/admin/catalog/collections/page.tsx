@@ -294,9 +294,9 @@ export default function AdminCollections() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl border border-border w-full max-w-md p-6"
+              className="bg-white rounded-xl border border-border w-full max-w-md flex flex-col max-h-[90vh]"
             >
-              <div className="flex items-start justify-between mb-6">
+              <div className="flex items-start justify-between p-6 pb-4">
                 <div>
                   <h3 className="font-display text-xl font-bold">
                     {form.id ? 'Edit Collection' : 'New Collection'}
@@ -316,7 +316,7 @@ export default function AdminCollections() {
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="flex-1 overflow-y-auto px-6 space-y-4">
                 <Field label="Name" required>
                   <input
                     type="text"
@@ -372,7 +372,6 @@ export default function AdminCollections() {
                 </Field>
                 <Field label="Banner image">
                   <ImageDropzone
-                    label="Banner image"
                     value={form.image ? [form.image] : []}
                     onChange={(urls) =>
                       setForm({ ...form, image: urls[0] ?? '' })
@@ -383,7 +382,6 @@ export default function AdminCollections() {
                 </Field>
                 <Field label="Mobile image (portrait)">
                   <ImageDropzone
-                    label="Mobile image"
                     value={form.mobileImage ? [form.mobileImage] : []}
                     onChange={(urls) =>
                       setForm({ ...form, mobileImage: urls[0] ?? '' })
@@ -417,7 +415,7 @@ export default function AdminCollections() {
                 </label>
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 p-6 pt-4">
                 <button
                   onClick={() => setFormOpen(false)}
                   disabled={busy}
