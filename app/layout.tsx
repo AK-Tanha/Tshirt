@@ -10,6 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { QueryProvider } from "@/context/QueryProvider";
 import { AuthProvider } from "@/components/AuthProvider";
 import { getSiteSettings } from "@/lib/server/site";
+import { absoluteUrl, getSiteUrl, socialMetadata } from "@/lib/server/seo";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 const plex = IBM_Plex_Mono({
@@ -28,20 +29,56 @@ const DEFAULT_LOGO = "/apan-logo-ink.png";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
+  const title = site.siteName;
+  const description =
+    site.description ??
+    "Premium Polos, T-Shirts, Activewear, and Kids Wear for the modern Bangladeshi.";
+  const url = getSiteUrl();
+
+  const social = await socialMetadata({
+    title,
+    description,
+    url,
+    images: site.logoUrl ? [site.logoUrl] : [],
+  });
+
   return {
+    metadataBase: new URL(url),
     title: {
-      default: site.siteName,
-      template: `%s | ${site.siteName}`,
+      default: title,
+      template: `%s | ${title}`,
     },
-    description:
-      site.description ??
-      "Premium Polos, T-Shirts, Activewear, and Kids Wear for the modern Bangladeshi.",
+    description,
+    keywords: [
+      "polos",
+      "t-shirts",
+      "activewear",
+      "kids wear",
+      "premium clothing Bangladesh",
+      "Dhaka fashion",
+    ],
+    authors: [{ name: site.siteName }],
+    category: "clothing",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    alternates: {
+      canonical: "/",
+    },
     icons: {
       icon: site.logoUrl ? [{ url: site.logoUrl }] : [
         { url: "/apan-logo-ink.png", media: "(prefers-color-scheme: light)" },
         { url: "/apan-logo-white.png", media: "(prefers-color-scheme: dark)" },
       ],
     },
+    ...social,
   };
 }
 
@@ -77,6 +114,34 @@ export default async function RootLayout({
             #apan-loader * { animation: none !important; }
           }
         `}</style>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": `${absoluteUrl()}#organization`,
+                  name: site.siteName,
+                  url: absoluteUrl(),
+                  ...(site.logoUrl
+                    ? { logo: absoluteUrl(site.logoUrl) }
+                    : {}),
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": `${absoluteUrl()}#website`,
+                  url: absoluteUrl(),
+                  name: site.siteName,
+                  description: site.description ?? undefined,
+                  publisher: { "@id": `${absoluteUrl()}#organization` },
+                  inLanguage: "en-US",
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body
         className="bg-white text-black font-body antialiased"

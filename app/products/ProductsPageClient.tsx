@@ -734,7 +734,7 @@ function ProductContent() {
   );
 }
 
-export default function ProductsPage() {
+export function ProductsPageClient() {
   return (
     <main className="px-page max-w-7xl mx-auto pb-16 md:pb-28">
       <Suspense fallback={<div>Loading...</div>}>
