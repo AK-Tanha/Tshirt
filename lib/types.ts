@@ -190,6 +190,52 @@ export interface ProductQueryParams {
   limit?: number;
 }
 
+// ----------------------------------------------------------------------------
+// Stock Movements (inventory in/out with reasons)
+// ----------------------------------------------------------------------------
+
+export type StockMovementType =
+  | 'PURCHASE_IN'
+  | 'SALE_OUT'
+  | 'ADJUSTMENT'
+  | 'RETURN_IN';
+
+export interface StockMovement {
+  id: string;
+  type: StockMovementType;
+  // signed: positive = stock in, negative = stock out
+  quantity: number;
+  reason: string | null;
+  createdAt: string;
+  variantId: string;
+  orderId?: string | null;
+  purchaseOrderId?: string | null;
+  variant?: ProductVariant;
+}
+
+export interface PaginatedStockMovements {
+  data: StockMovement[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface StockMovementQueryParams {
+  variantId?: string;
+  type?: StockMovementType;
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateStockMovementPayload {
+  variantId: string;
+  quantity: number;
+  reason: string;
+}
+
 export interface CreateProductPayload {
   name: string;
   description?: string;
