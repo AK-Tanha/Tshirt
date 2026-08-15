@@ -9,7 +9,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useOrder, useLookupOrder } from "@/hooks/use-orders";
 import { Order, OrderStatus } from "@/lib/types";
 import { cn, getHeroImage } from "@/lib/utils";
-import { CheckCircle2, Package, Phone, MapPin, ChevronLeft } from "lucide-react";
+import { CheckCircle2, Package, Phone, MapPin, ChevronLeft, UserPlus } from "lucide-react";
 
 const statusStyles: Record<OrderStatus, string> = {
   PENDING: "bg-amber-50 text-amber-700 border-amber-200",
@@ -141,6 +141,45 @@ function OrderDetails({ order }: { order: Order }) {
   );
 }
 
+function GuestOrderView({ order }: { order: Order }) {
+  const { user } = useAuthStore();
+  const redirect = `/order/${order.id}`;
+
+  return (
+    <div className="space-y-6">
+      <OrderDetails order={order} />
+      {!user && (
+        <div className="bg-white border border-border rounded-2xl p-6 text-center">
+          <div className="w-10 h-10 rounded-xl bg-stone flex items-center justify-center mx-auto mb-3">
+            <UserPlus className="w-4 h-4 text-ink" />
+          </div>
+          <h2 className="font-display text-lg font-semibold text-ink">
+            Track this order anytime
+          </h2>
+          <p className="font-body text-sm text-muted mt-1 mb-4">
+            Create an account or sign in and we’ll link this order to your
+            profile.
+          </p>
+          <div className="flex flex-col gap-2">
+            <Link
+              href={`/register?redirect=${encodeURIComponent(redirect)}`}
+              className="w-full bg-ink text-white py-3 rounded-full font-body text-sm font-semibold hover:bg-ink/90 transition-colors"
+            >
+              Create an account
+            </Link>
+            <Link
+              href={`/login?redirect=${encodeURIComponent(redirect)}`}
+              className="w-full border border-border text-ink py-3 rounded-full font-body text-sm font-medium hover:bg-stone transition-colors"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function OrderLookup() {
   const { id } = useParams<{ id: string }>();
   const lookup = useLookupOrder();
@@ -184,7 +223,7 @@ function OrderLookup() {
           {lookup.isPending ? "Looking up..." : "View order"}
         </button>
       </form>
-      {lookup.data && <OrderDetails order={lookup.data} />}
+      {lookup.data && <GuestOrderView order={lookup.data} />}
     </div>
   );
 }
@@ -209,7 +248,7 @@ export default function OrderPage() {
           <ChevronLeft className="w-3 h-3" /> Back to shop
         </Link>
         {order ? (
-          <OrderDetails order={order} />
+          <GuestOrderView order={order} />
         ) : orderQuery.isLoading ? (
           <p className="text-center py-24 text-muted">Loading order...</p>
         ) : user ? (

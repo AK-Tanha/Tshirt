@@ -86,11 +86,6 @@ export default function CheckoutPage() {
           <h1 className="font-display text-5xl md:text-6xl text-ink tracking-tight leading-none font-bold">
             Complete <em className="font-light italic">order</em>
           </h1>
-          {!user && (
-            <p className="mt-4 font-body text-sm text-muted">
-              No account needed — just your delivery details.
-            </p>
-          )}
         </div>
 
         <div className="lg:hidden space-y-3 mb-8">

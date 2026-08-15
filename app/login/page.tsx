@@ -1,15 +1,25 @@
 "use client";
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLogin } from '@/hooks/use-auth';
 import { useSite } from '@/hooks/use-site';
 import { Logo } from '@/components/Logo';
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const { mutate, isPending, error } = useLogin();
   const { data: site } = useSite();
 
@@ -19,7 +29,11 @@ export default function LoginPage() {
       { phone, password },
       {
         onSuccess: ({ user }) => {
-          router.push(user.role === 'ADMIN' ? '/admin' : '/');
+          if (redirect) {
+            router.push(redirect);
+          } else {
+            router.push(user.role === 'ADMIN' ? '/admin' : '/');
+          }
         },
       },
     );
@@ -90,7 +104,10 @@ export default function LoginPage() {
 
         <p className="text-sm text-muted text-center mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-black font-medium underline underline-offset-4 hover:opacity-70 transition-opacity">
+          <Link
+            href={`/register${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
+            className="text-black font-medium underline underline-offset-4 hover:opacity-70 transition-opacity"
+          >
             Create one
           </Link>
         </p>

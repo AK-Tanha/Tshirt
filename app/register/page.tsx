@@ -1,15 +1,25 @@
 "use client";
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useRegister } from '@/hooks/use-auth';
 import { useSite } from '@/hooks/use-site';
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const { mutate, isPending, error } = useRegister();
   const { data: site } = useSite();
 
@@ -19,7 +29,11 @@ export default function RegisterPage() {
       { name, phone, password },
       {
         onSuccess: ({ user }) => {
-          router.push(user.role === 'ADMIN' ? '/admin' : '/');
+          if (redirect) {
+            router.push(redirect);
+          } else {
+            router.push(user.role === 'ADMIN' ? '/admin' : '/');
+          }
         },
       },
     );
@@ -103,9 +117,12 @@ export default function RegisterPage() {
           </form>
         </div>
 
-        <p className="text-sm text-muted text-center mt-6">
+<p className="text-sm text-muted text-center mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-black font-medium underline underline-offset-4 hover:opacity-70 transition-opacity">
+          <Link
+            href={`/login${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
+            className="text-black font-medium underline underline-offset-4 hover:opacity-70 transition-colors"
+          >
             Sign in
           </Link>
         </p>
