@@ -89,7 +89,7 @@ function createInvoice(order: Order): Invoice {
     tax,
     grandTotal: subtotal + tax,
     status: order.status === "DELIVERED" ? "paid" : "unpaid",
-    issuedAt: new Date().toISOString(),
+    issuedAt: order.createdAt,
   };
 }
 
@@ -101,7 +101,7 @@ export default function OrderDetailPage() {
   const updateStatus = useUpdateOrderStatus();
   const updateOrder = useUpdateAdminOrder();
   const deleteOrder = useDeleteAdminOrder();
-  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 100 });
+  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 });
   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
   const [editing, setEditing] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -195,6 +195,22 @@ export default function OrderDetailPage() {
       toast("Name, phone, address and at least one valid line item are required", "error");
       return;
     }
+
+    const usedCounts = new Map<string, number>();
+    for (const it of editValidItems) {
+      usedCounts.set(it.variantId, (usedCounts.get(it.variantId) ?? 0) + Number(it.quantity));
+    }
+    for (const [variantId, quantity] of usedCounts) {
+      const v = allVariants.find((x) => x.id === variantId);
+      if (v && quantity > v.stock) {
+        toast(
+          `Insufficient stock for ${v.productName} (${v.size} / ${v.color}): only ${v.stock} available`,
+          "error",
+        );
+        return;
+      }
+    }
+
     updateOrder.mutate(
       {
         id: order.id,
@@ -389,19 +405,25 @@ export default function OrderDetailPage() {
                             Loading variants...
                           </div>
                         ) : (
-                          <select
-                            value={item.variantId}
-                            onChange={(e) => updateEditItem(item.id, { variantId: e.target.value })}
-                            className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
-                          >
-                            <option value="">Select variant...</option>
-                            {allVariants.map((v) => (
-                              <option key={v.id} value={v.id}>
-                                {v.productName} · {v.size} / {v.color} · ৳
-                                {editUnitPrice(v.id).toLocaleString()} (stock {v.stock})
-                              </option>
-                            ))}
-                          </select>
+<select
+  value={item.variantId}
+  onChange={(e) => updateEditItem(item.id, { variantId: e.target.value })}
+  className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm outline-none focus:border-black transition-colors"
+>
+  <option value="">Select variant...</option>
+  {allVariants
+    .filter(
+      (v) =>
+        v.id === item.variantId ||
+        !editItems.some((other) => other.id !== item.id && other.variantId === v.id),
+    )
+    .map((v) => (
+      <option key={v.id} value={v.id}>
+        {v.productName} · {v.size} / {v.color} · ৳
+        {editUnitPrice(v.id).toLocaleString()} (stock {v.stock})
+      </option>
+    ))}
+</select>
                         )}
                       </div>
                       <div className="col-span-4 sm:col-span-2">

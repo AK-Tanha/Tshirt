@@ -94,6 +94,7 @@ export interface Collection {
   slug: string;
   description: string | null;
   image: string | null;
+  mobileImage?: string | null;
   isActive: boolean;
   createdAt: string;
   _count?: {
@@ -124,6 +125,7 @@ export interface CreateCollectionPayload {
   slug: string;
   description?: string;
   image?: string;
+  mobileImage?: string;
   isActive?: boolean;
   productIds?: string[];
 }

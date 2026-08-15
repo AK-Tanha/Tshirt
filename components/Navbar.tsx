@@ -106,7 +106,7 @@ export const Navbar = () => {
 
           {/* Desktop links */}
           <div className="hidden md:flex gap-10 items-center">
-            {categories?.map((cat) => (
+            {categories?.slice(0, 3).map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/products?category=${cat.slug}`}
@@ -198,7 +198,7 @@ export const Navbar = () => {
                 </span>
                 <ArrowRight className="w-4 h-4 text-ink/30 group-hover:text-ink group-hover:translate-x-1 transition-all" />
               </Link>
-              {categories?.map((cat, i) => (
+              {categories?.slice(0, 3).map((cat, i) => (
                 <motion.div
                   key={cat.slug}
                   initial={{ opacity: 0, x: -16 }}

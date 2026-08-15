@@ -10,7 +10,9 @@ export function useRegister() {
   return useMutation({
     mutationFn: async (payload: RegisterPayload) => {
       const data = await register(payload);
-      const user = await getMe(); // token isn't attached to headers until stored, so fetch user after
+      // store the token before calling /auth/me so apiFetch attaches it
+      localStorage.setItem('access_token', data.access_token);
+      const user = await getMe();
       setAuth(user, data.access_token);
       return { user, access_token: data.access_token };
     },

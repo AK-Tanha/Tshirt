@@ -237,10 +237,18 @@ function ProductContent() {
   const categorySlug = searchParams.get("category") ?? undefined;
   const collectionSlug = searchParams.get("collection") ?? undefined;
 
+  const searchParam = searchParams.get("search") ?? "";
+
   const [sort, setSort] = useState<SortKey>("featured");
   const [sortOpen, setSortOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(searchParam);
+  const [prevSearchParam, setPrevSearchParam] = useState(searchParam);
+  // keep the local search in sync when the URL changes (e.g. hero search submit)
+  if (searchParam !== prevSearchParam) {
+    setPrevSearchParam(searchParam);
+    setQuery(searchParam);
+  }
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");

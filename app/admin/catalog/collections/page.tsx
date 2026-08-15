@@ -36,6 +36,7 @@ interface CollectionFormState {
   slug: string;
   description: string;
   image: string;
+  mobileImage: string;
   isActive: boolean;
 }
 
@@ -45,6 +46,7 @@ const emptyForm: CollectionFormState = {
   slug: '',
   description: '',
   image: '',
+  mobileImage: '',
   isActive: true,
 };
 
@@ -87,6 +89,11 @@ export default function AdminCollections() {
     setPickerSearch('');
   }
 
+  const closeManage = () => {
+    setPrevDetailId(null);
+    setManageTarget(null);
+  };
+
   const pq = pickerSearch.toLowerCase();
   const pickerProducts = allProducts.filter(
     (p) => p.name.toLowerCase().includes(pq) || (p.brand?.name ?? '').toLowerCase().includes(pq),
@@ -113,6 +120,7 @@ export default function AdminCollections() {
       slug: collection.slug,
       description: collection.description ?? '',
       image: collection.image ?? '',
+      mobileImage: collection.mobileImage ?? '',
       isActive: collection.isActive,
     });
     setSlugTouched(true);
@@ -129,6 +137,7 @@ export default function AdminCollections() {
       slug: toSlug(form.slug.trim()),
       description: form.description.trim() || undefined,
       image: form.image.trim() || undefined,
+      mobileImage: form.mobileImage.trim() || undefined,
       isActive: form.isActive,
     };
 
@@ -372,6 +381,21 @@ export default function AdminCollections() {
                     heroUrl={form.image}
                   />
                 </Field>
+                <Field label="Mobile image (portrait)">
+                  <ImageDropzone
+                    label="Mobile image"
+                    value={form.mobileImage ? [form.mobileImage] : []}
+                    onChange={(urls) =>
+                      setForm({ ...form, mobileImage: urls[0] ?? '' })
+                    }
+                    maxImages={1}
+                    heroUrl={form.mobileImage}
+                  />
+                  <p className="text-[11px] text-neutral-400 mt-1.5">
+                    Portrait crop used on small screens (hero). Falls back to
+                    the banner image when not set.
+                  </p>
+                </Field>
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-sm">Visible on storefront</span>
                   <button
@@ -423,7 +447,7 @@ export default function AdminCollections() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50"
-            onClick={() => !savingProducts && setManageTarget(null)}
+            onClick={() => !savingProducts && closeManage()}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -443,7 +467,7 @@ export default function AdminCollections() {
                   </p>
                 </div>
                 <button
-                  onClick={() => setManageTarget(null)}
+                  onClick={() => closeManage()}
                   disabled={savingProducts}
                   className="p-1.5 hover:bg-stone rounded-lg transition-colors"
                 >
@@ -522,7 +546,7 @@ export default function AdminCollections() {
 
               <div className="flex gap-3 p-6 pt-4 border-t border-border">
                 <button
-                  onClick={() => setManageTarget(null)}
+                  onClick={() => closeManage()}
                   disabled={savingProducts}
                   className="flex-1 px-4 py-2.5 border border-border text-sm font-medium rounded-lg hover:bg-stone transition-colors disabled:opacity-50"
                 >
@@ -538,7 +562,7 @@ export default function AdminCollections() {
                         onSuccess: () => {
                           toast('Collection products updated');
                           setSavingProducts(false);
-                          setManageTarget(null);
+                          closeManage();
                         },
                         onError: (err) => {
                           toast(err.message, 'error');

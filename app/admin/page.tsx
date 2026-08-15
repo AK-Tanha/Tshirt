@@ -39,7 +39,7 @@ const statusLabels: Record<string, string> = {
 
 export default function AdminDashboard() {
   const { data: orders = [], isLoading: ordersLoading } = useAdminOrders();
-  const { data: productsRes, isLoading: productsLoading } = useProducts({ limit: 100 });
+  const { data: productsRes, isLoading: productsLoading } = useProducts({ limit: 1000 });
   const { data: users = [], isLoading: usersLoading } = useUsers();
 
   const loading = (ordersLoading || productsLoading || usersLoading) && orders.length === 0;

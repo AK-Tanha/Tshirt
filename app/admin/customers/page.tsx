@@ -413,7 +413,7 @@ export default function AdminCustomers() {
                     onChange={(e) => setForm({ ...form, password: e.target.value })}
                     placeholder={form.id ? 'Leave blank to keep current' : 'At least 6 characters'}
                     disabled={busy}
-                    className={getInputClass(!passwordValid ? 'error' : undefined, 'disabled:opacity-50')}
+                    className={getInputClass(undefined, 'disabled:opacity-50')}
                   />
                 </Field>
                 <Field label="Address">

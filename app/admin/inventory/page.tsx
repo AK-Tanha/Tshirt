@@ -58,7 +58,7 @@ function timeAgo(iso: string): string {
 
 export default function AdminInventory() {
   const { data: productsData, isLoading: loadingProducts } = useProducts({
-    limit: 100,
+    limit: 1000,
   });
   const { data: suppliers = [], isLoading: loadingSuppliers } = useSuppliers();
   const { data: movementsData, isLoading: loadingMovements } = useStockMovements({
@@ -79,6 +79,12 @@ export default function AdminInventory() {
       const arr = map.get(m.variantId);
       if (arr) arr.push(m);
       else map.set(m.variantId, [m]);
+    }
+    for (const arr of map.values()) {
+      arr.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
     }
     return map;
   }, [movementsData]);

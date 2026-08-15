@@ -29,6 +29,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'apan-backend.vercel.app',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   output: 'standalone',

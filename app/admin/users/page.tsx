@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useUsers, useUpdateUserRole } from '@/hooks/use-users';
+import { useAuthStore } from '@/stores/auth-store';
 import { useToast } from '@/components/ui/Toast';
 import { Card } from '@/components/ui/Card';
 import { motion } from 'motion/react';
@@ -23,6 +24,7 @@ export default function AdminUsers() {
   const { data: users = [], isLoading } = useUsers();
   const updateRole = useUpdateUserRole();
   const { toast } = useToast();
+  const currentAdmin = useAuthStore((s) => s.user);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
 
@@ -37,6 +39,10 @@ export default function AdminUsers() {
   });
 
   const handleRoleToggle = (user: UserRecord) => {
+    if (currentAdmin?.id === user.id) {
+      toast("You can't change your own role", 'error');
+      return;
+    }
     const next: 'USER' | 'ADMIN' = user.role === 'ADMIN' ? 'USER' : 'ADMIN';
     updateRole.mutate(
       { id: user.id, role: next },
@@ -164,9 +170,15 @@ export default function AdminUsers() {
                   <td className="p-4">
                     <button
                       onClick={() => handleRoleToggle(user)}
-                      disabled={pending}
-                      className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-xs font-medium rounded-lg hover:bg-neutral-100 transition-colors disabled:opacity-50"
-                      title={user.role === 'ADMIN' ? 'Remove admin' : 'Make admin'}
+                      disabled={pending || currentAdmin?.id === user.id}
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-border text-xs font-medium rounded-lg hover:bg-neutral-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      title={
+                        currentAdmin?.id === user.id
+                          ? "You can't change your own role"
+                          : user.role === 'ADMIN'
+                            ? 'Remove admin'
+                            : 'Make admin'
+                      }
                     >
                       {pending ? (
                         <Loader2 className="w-3 h-3 animate-spin" />

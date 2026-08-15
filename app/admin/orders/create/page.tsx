@@ -27,7 +27,7 @@ export default function CreateOrderPage() {
   const { toast } = useToast();
   const createOrder = useCreateAdminOrder();
   const { data: customers = [], isLoading: customersLoading } = useCustomers();
-  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 100 });
+  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 });
 
   const [mode, setMode] = useState<CustomerMode>('existing');
   const [customerSearch, setCustomerSearch] = useState('');

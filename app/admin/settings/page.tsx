@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/Toast';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -26,25 +26,48 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
  );
 }
 
+const DEFAULTS = {
+  storeEmail: 'hello@apanapparel.com',
+  storePhone: '+880 1700-000000',
+  storeAddress: 'Dhaka, Bangladesh',
+  currency: 'BDT',
+  codEnabled: true,
+  orderNotification: true,
+  stockAlert: true,
+};
+
 function loadSettings() {
- if (typeof window === 'undefined') return null;
- try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch { return null; }
+  if (typeof window === 'undefined') return null;
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch { return null; }
 }
 
 export default function AdminSettings() {
- const [tab, setTab] = useState<Tab>('general');
- const [storeName, setStoreName] = useState('');
- const [logoUrl, setLogoUrl] = useState('');
- const [storeEmail, setStoreEmail] = useState(() => loadSettings()?.storeEmail ?? 'hello@apanapparel.com');
- const [storePhone, setStorePhone] = useState(() => loadSettings()?.storePhone ?? '+880 1700-000000');
- const [storeAddress, setStoreAddress] = useState(() => loadSettings()?.storeAddress ?? 'Dhaka, Bangladesh');
- const [currency, setCurrency] = useState(() => loadSettings()?.currency ?? 'BDT');
- const [codEnabled, setCodEnabled] = useState(() => loadSettings()?.codEnabled ?? true);
- const [orderNotification, setOrderNotification] = useState(() => loadSettings()?.orderNotification ?? true);
- const [stockAlert, setStockAlert] = useState(() => loadSettings()?.stockAlert ?? true);
- const { data: site, isLoading: siteLoading } = useSite();
- const { mutate: saveSite, isPending: saving } = useUpdateSite();
- const { toast } = useToast();
+  const [tab, setTab] = useState<Tab>('general');
+  const [storeName, setStoreName] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [storeEmail, setStoreEmail] = useState(DEFAULTS.storeEmail);
+  const [storePhone, setStorePhone] = useState(DEFAULTS.storePhone);
+  const [storeAddress, setStoreAddress] = useState(DEFAULTS.storeAddress);
+  const [currency, setCurrency] = useState(DEFAULTS.currency);
+  const [codEnabled, setCodEnabled] = useState(DEFAULTS.codEnabled);
+  const [orderNotification, setOrderNotification] = useState(DEFAULTS.orderNotification);
+  const [stockAlert, setStockAlert] = useState(DEFAULTS.stockAlert);
+  const { data: site, isLoading: siteLoading } = useSite();
+  const { mutate: saveSite, isPending: saving } = useUpdateSite();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const stored = loadSettings();
+    if (!stored) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStoreEmail(stored.storeEmail ?? DEFAULTS.storeEmail);
+    setStorePhone(stored.storePhone ?? DEFAULTS.storePhone);
+    setStoreAddress(stored.storeAddress ?? DEFAULTS.storeAddress);
+    setCurrency(stored.currency ?? DEFAULTS.currency);
+    setCodEnabled(stored.codEnabled ?? DEFAULTS.codEnabled);
+    setOrderNotification(stored.orderNotification ?? DEFAULTS.orderNotification);
+    setStockAlert(stored.stockAlert ?? DEFAULTS.stockAlert);
+  }, []);
 
  const nameValue = storeName || site?.siteName || '';
  const logoValue = logoUrl || site?.logoUrl || '';

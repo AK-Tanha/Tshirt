@@ -31,7 +31,7 @@ function getStockInfo(product: Product): {
 }
 
 export default function AdminProducts() {
-  const { data, isLoading } = useProducts({ limit: 100 });
+  const { data, isLoading } = useProducts({ limit: 1000 });
   const { data: suppliers = [] } = useSuppliers();
   const deleteProduct = useDeleteProduct();
   const products = data?.data ?? [];
@@ -166,7 +166,7 @@ export default function AdminProducts() {
                             {product.name}
                           </Link>
                           <p className="text-xs text-neutral-500 truncate">
-                            {product?.description?.substring(0, 50) + "..."}
+                            {product.description ? product.description.substring(0, 50) + "..." : "No description"}
                           </p>
                         </div>
                       </div>

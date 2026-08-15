@@ -22,7 +22,7 @@ export default function CreatePurchaseOrderPage() {
   const { toast } = useToast();
   const createPO = useCreatePurchaseOrder();
   const { data: suppliers = [] } = useSuppliers();
-  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 100 });
+  const { data: productsData, isLoading: productsLoading } = useProducts({ limit: 1000 });
 
   const [supplierId, setSupplierId] = useState('');
   const [notes, setNotes] = useState('');

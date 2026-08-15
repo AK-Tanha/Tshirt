@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { navItems } from '@/lib/navigation';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   Search, Bell, Menu, ChevronDown, User,
  Settings, LogOut, HelpCircle,
@@ -23,6 +25,9 @@ function getPageTitle(pathname: string): string {
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const [searchOpen, setSearchOpen] = useState(false);
  const [searchQuery, setSearchQuery] = useState('');
  const [profileOpen, setProfileOpen] = useState(false);
@@ -85,16 +90,16 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
  exit={{ opacity: 0, y: 4 }}
  className="absolute top-full left-0 right-0 mt-1 bg-white border border-border rounded-xl shadow-lg overflow-hidden"
  >
- {searchResults.slice(0, 8).map((r) => (
- <a
- key={r.href}
- href={r.href}
- className="block px-4 py-2.5 text-sm hover:bg-neutral-100 transition-colors"
- onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
- >
- {r.label}
- </a>
- ))}
+{searchResults.slice(0, 8).map((r) => (
+  <Link
+  key={r.href}
+  href={r.href}
+  className="block px-4 py-2.5 text-sm hover:bg-neutral-100 transition-colors"
+  onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
+  >
+  {r.label}
+  </Link>
+  ))}
  </motion.div>
  )}
  </AnimatePresence>
@@ -125,21 +130,28 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
  exit={{ opacity: 0, y: 4 }}
  className="absolute top-full right-0 mt-1 w-56 bg-white border border-border rounded-xl shadow-lg overflow-hidden py-1"
  >
- <div className="px-4 py-3 border-b border-border">
- <p className="text-sm font-medium">Admin User</p>
- <p className="text-xs text-neutral-500">admin@apan.apparel</p>
- </div>
- <a href="/admin/settings" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-neutral-100 transition-colors" onClick={() => setProfileOpen(false)}>
- <Settings className="w-4 h-4" /> Settings
- </a>
- <a href="#" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-neutral-100 transition-colors" onClick={() => setProfileOpen(false)}>
- <HelpCircle className="w-4 h-4" /> Help
- </a>
- <div className="border-t border-border mt-1 pt-1">
- <a href="/" className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors" onClick={() => setProfileOpen(false)}>
- <LogOut className="w-4 h-4" /> Sign Out
- </a>
- </div>
+<div className="px-4 py-3 border-b border-border">
+<p className="text-sm font-medium">{user?.name ?? 'Admin User'}</p>
+<p className="text-xs text-neutral-500">{user?.phone ?? 'Admin'}</p>
+</div>
+<Link href="/admin/settings" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-neutral-100 transition-colors" onClick={() => setProfileOpen(false)}>
+<Settings className="w-4 h-4" /> Settings
+</Link>
+<Link href="/admin/support" className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-neutral-100 transition-colors" onClick={() => setProfileOpen(false)}>
+<HelpCircle className="w-4 h-4" /> Help
+</Link>
+<div className="border-t border-border mt-1 pt-1">
+<button
+className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+onClick={() => {
+setProfileOpen(false);
+logout();
+router.push('/');
+}}
+>
+<LogOut className="w-4 h-4" /> Sign Out
+</button>
+</div>
  </motion.div>
  )}
  </AnimatePresence>
