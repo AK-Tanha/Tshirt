@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRegister } from '@/hooks/use-auth';
 import { useSite } from '@/hooks/use-site';
+import { Logo } from '@/components/Logo';
 
 export default function RegisterPage() {
   return (
@@ -43,13 +44,19 @@ function RegisterForm() {
     <div className="min-h-screen flex items-center justify-center bg-surface px-4">
       <div className="w-full max-w-sm">
         <Link href="/" className="group flex flex-col items-center mb-10">
-          <span className="font-display text-4xl tracking-[0.15em] text-black font-bold leading-none group-hover:scale-105 transition-transform duration-300">
-            {site?.siteName ?? "APAN"}
-          </span>
-          <span className="text-[10px] tracking-[0.3em] uppercase text-black/60 -mt-1">
-            Fashion
-          </span>
+          <Logo
+            alt={site?.siteName ?? "APAN"}
+            src={site?.logoUrl ?? undefined}
+            priority
+            className="h-14 w-auto group-hover:scale-105 transition-transform duration-300"
+          />
         </Link>
+
+        {redirect && (
+          <p className="text-sm text-center text-muted mb-6">
+            You are only <span className="text-black font-semibold">one step behind</span> to place the order
+          </p>
+        )}
 
         <div className="bg-white border border-border rounded-2xl p-8 shadow-sm animate-fade-in">
           <h1 className="text-xl font-semibold text-center">Create account</h1>

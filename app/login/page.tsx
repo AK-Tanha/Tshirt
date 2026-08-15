@@ -51,6 +51,12 @@ function LoginForm() {
           />
         </Link>
 
+        {redirect && (
+          <p className="text-sm text-center text-muted mb-6">
+            You are only <span className="text-black font-semibold">one step behind</span> to place the order
+          </p>
+        )}
+
         <div className="bg-white border border-border rounded-2xl p-8 shadow-sm animate-fade-in">
           <h1 className="text-xl font-semibold text-center">Welcome back</h1>
           <p className="text-sm text-muted text-center mt-1 mb-8">
