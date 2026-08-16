@@ -441,6 +441,8 @@ export default function Home() {
                       src={collection.mobileImage ?? collection.image}
                       alt={collection.name}
                       referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out md:hidden"
                     />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -448,6 +450,8 @@ export default function Home() {
                       src={collection.image}
                       alt={collection.name}
                       referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out hidden md:block"
                     />
                   </>

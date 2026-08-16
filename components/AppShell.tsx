@@ -1,9 +1,14 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import { CartDrawer } from './CartDrawer';
+
+const CartDrawer = dynamic(() => import('./CartDrawer').then((m) => m.CartDrawer), {
+  ssr: false,
+  loading: () => null,
+});
 
 export function AppShell({ children }: { children: React.ReactNode }) {
  const pathname = usePathname();
