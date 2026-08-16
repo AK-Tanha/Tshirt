@@ -14,7 +14,10 @@ const DEFAULT_SITE: SiteSettings = {
 export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   if (!API_URL) return DEFAULT_SITE;
   try {
-    const res = await fetch(`${API_URL}/site`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/site`, {
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!res.ok) return DEFAULT_SITE;
     const json = await res.json();
     return json?.data ?? DEFAULT_SITE;
